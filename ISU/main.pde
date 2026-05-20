@@ -9,12 +9,11 @@ void setup(){
 }
 
 void draw(){
-  background(255);
+  println("mouse is at: (" + xScreenToPos(mouseX) + " , " + yScreenToPos(mouseY) +" )" + '\n' + "The zoom is " + zoom);
+  background(#006994);
   handleCamera();
-  fill(color(#000000));
-  float[] screenPos = posToScreenSpace(new float[]{0, 0});
-  rect(screenPos[0], screenPos[1], 20/zoom, 20/zoom);
-  
+  fill(color(#BA4779));
+
   for(Province p: provinces){
     p.draw();
   }

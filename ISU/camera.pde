@@ -4,6 +4,9 @@ float zoom = 1;
 float[] centre = {0, 0};
 boolean holdingPan = false;
 
+static float MIN_ZOOM = 0.01;
+static float ZOOM_AMOUNT = 20;
+
 void mousePressed() {
     if (mouseButton == CENTER) {
         holdingPan = true;
@@ -43,6 +46,17 @@ float[] screenSpaceToPos(float[] pos) {
   return new float[]{newx, newy};
 }
 
+// takes a position on the screen, and converts it to world co-ordinates
+float xScreenToPos(float pos) {
+  return centre[0] + (pos - height/2) * zoom;
+}
+
+// takes a position on the screen, and converts it to world co-ordinates
+float yScreenToPos(float pos) {
+  return centre[1] + (pos - height/2) * zoom;
+}
+
+
 // takes a world position and converts it to screen co-ordinates
 float[] posToScreenSpace(float[] pos) {
   float newx = width/2 + (pos[0] - centre[0]) / zoom;
@@ -61,8 +75,8 @@ float yPosToScreenSpace(float yPos){
 void mouseWheel(MouseEvent event) {
   float amount = event.getCount() ;
 
-  zoom += 0.5 * amount;
-  if (zoom < 0.2) zoom = 0.2;
+  zoom += ZOOM_AMOUNT * amount;
+  if (zoom < MIN_ZOOM) zoom = MIN_ZOOM;
 }
 
 
