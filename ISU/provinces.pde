@@ -1,3 +1,5 @@
+
+
 ArrayList<Province> provinces = new ArrayList<Province>();
 
 class Province {
@@ -29,10 +31,16 @@ class Province {
       endShape();
     }
   }
+  
+  
+  boolean inProvince(){
+    
+    return false;
+  }
 }
 
 void loadProvinces() {
-  JSONObject geojson = loadJSONObject("Isles.geojson");
+  JSONObject geojson = loadJSONObject("MergedIsles.geojson");
   JSONArray features = geojson.getJSONArray("features");
 
   for (int i = 0; i < features.size(); i++) {

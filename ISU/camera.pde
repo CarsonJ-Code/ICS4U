@@ -1,11 +1,12 @@
 float[] mousePan = {0, 0};
 float[] mouseLast = {0, 0};
-float zoom = 1;
+float zoom = 5;
 float[] centre = {0, 0};
 boolean holdingPan = false;
 
-static float MIN_ZOOM = 0.01;
-static float ZOOM_AMOUNT = 20;
+static float MIN_ZOOM = 300;
+static float MAX_ZOOM = 2750;
+static float ZOOM_AMOUNT = 25;
 
 void mousePressed() {
     if (mouseButton == CENTER) {
@@ -77,6 +78,7 @@ void mouseWheel(MouseEvent event) {
 
   zoom += ZOOM_AMOUNT * amount;
   if (zoom < MIN_ZOOM) zoom = MIN_ZOOM;
+  if (zoom > MAX_ZOOM) zoom = MAX_ZOOM;
 }
 
 
