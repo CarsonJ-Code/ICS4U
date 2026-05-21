@@ -7,6 +7,11 @@ class Province {
   int controller;
   String name;
 
+  float minX;
+  float maxX;
+  float minY;
+  float maxY;
+
   Province(ArrayList<ArrayList<float[]>> coordsArg, String nameArg) {
     coords = coordsArg;
     name = nameArg;
@@ -31,11 +36,33 @@ class Province {
       endShape();
     }
   }
-  
-  
-  boolean inProvince(){
-    
-    return false;
+
+  void findBounding() {
+    for (int i = 0; i < coords.size(); i++) {
+      ArrayList<float[]> currPoly = coords.get(i);
+      float[] firstCoord = currPoly.get(0);
+      minX =firstCoord[0];
+      maxX = firstCoord[0];
+      minY = firstCoord[1];
+      maxY = firstCoord[1];
+      for (int j = 0; j < currPoly.size(); j++) {
+        float[] coord = currPoly.get(j);
+
+        if (coord[0] < minX) minX = coord[0];
+        if (coord[0] > maxX) maxX = coord[0];
+
+        if (coord[1] < minY) minY = coord[0];
+        if (coord[1] > maxY) maxY = coord[0];
+      }
+    }
+  }
+
+
+  boolean inProvince(float x, float y) {
+    if (x >= minX && x <= maxX && y >= minY && y <= maxY){
+      return true;
+    }
+      return false;
   }
 }
 
