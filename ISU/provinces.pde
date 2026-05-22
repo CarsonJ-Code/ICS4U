@@ -1,5 +1,3 @@
-
-
 ArrayList<Province> provinces = new ArrayList<Province>();
 
 class Province {
