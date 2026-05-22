@@ -1,19 +1,29 @@
 #!/usr/bin/env python3
 """
-merge_geojson.py — Merge GeoJSON features whose name contains a given string.
+merge_geojson.py — Merge GeoJSON features by name, for any number of merge groups.
 
-All non-matching features are passed through unchanged. Matching features are
-replaced by a single merged feature whose geometry is the dissolved union and
-whose properties are taken from the first matched feature, with the name
-property set to the search string.
+Merges are defined in a JSON config file. Each group has one or more search
+strings — any feature whose name contains at least one of them is included.
+"search" may be a single string or a list of strings. All non-matching features
+are passed through unchanged.
+
+Config file format (merges.json):
+    [
+        {"search": ["East London", "Inner London"], "output_name": "London"},
+        {"search": ["Devon", "Cornwall"],           "output_name": "Southwest Peninsula"},
+        {"search": "Yorkshire",                     "output_name": "Yorkshire"}
+    ]
 
 Usage:
-    python merge_geojson.py <input.geojson> <search_string> [output.geojson]
+    python merge_geojson.py <input.geojson> <merges.json> [output.geojson]
 
 Examples:
-    python merge_geojson.py regions.geojson "London"
-    python merge_geojson.py regions.geojson "London" london_merged.geojson
-    python merge_geojson.py regions.geojson "London" out.geojson --name-property label
+    python merge_geojson.py regions.geojson merges.json
+    python merge_geojson.py regions.geojson merges.json out.geojson
+    python merge_geojson.py regions.geojson merges.json out.geojson --name-property label
+
+A feature is consumed by the first group that matches its name.
+Each merged feature is inserted at the position of the first match in its group.
 
 Dependencies:
     pip install shapely
@@ -55,10 +65,7 @@ def get_feature_name(feature: dict, name_property: str) -> str:
 
 
 def find_name_property(features: list) -> str:
-    """
-    Auto-detect the property key most likely to hold a feature's name.
-    Prefers keys like 'name', 'Name', 'NAME', then falls back to the first string property.
-    """
+    """Auto-detect the property key most likely to hold a feature's name."""
     preferred = ["name", "Name", "NAME", "label", "Label", "LABEL",
                  "title", "Title", "TITLE", "nm", "NM"]
     if not features:
@@ -73,17 +80,26 @@ def find_name_property(features: list) -> str:
     return "name"
 
 
-def merge_properties(matched_features: list, name_property: str, search_string: str) -> dict:
-    """
-    Build a merged properties dict from all matched features.
-    Uses the first feature's properties as the base, then sets the name
-    property to the search string.
-    """
+def normalise_search(raw) -> list:
+    """Accept a string or list of strings; always return a list of strings."""
+    if isinstance(raw, str):
+        return [raw]
+    if isinstance(raw, list):
+        return [str(s) for s in raw]
+    raise ValueError(f"'search' must be a string or list of strings, got: {type(raw)}")
+
+
+def feature_matches(haystack: str, needles: list) -> bool:
+    """Return True if haystack contains any of the needles."""
+    return any(n in haystack for n in needles)
+
+
+def merge_properties(matched_features: list, name_property: str, output_name: str) -> dict:
+    """Properties from the first matched feature, with name overwritten."""
     if not matched_features:
-        return {name_property: search_string}
-    # Deep copy properties from the first matched feature as the base
+        return {name_property: output_name}
     props = copy.deepcopy(matched_features[0].get("properties") or {})
-    props[name_property] = search_string
+    props[name_property] = output_name
     return props
 
 
@@ -93,15 +109,19 @@ def merge_properties(matched_features: list, name_property: str, search_string: 
 
 def process(
     geojson: dict,
-    search_string: str,
+    merge_groups: list,
     name_property: str | None = None,
     case_sensitive: bool = False,
 ) -> dict:
     """
-    - Non-matching features are passed through unchanged.
-    - Matching features are dissolved into a single feature inserted at the
-      position of the first match. Properties come from the first matched
-      feature, with the name field set to search_string.
+    Apply multiple merge groups to a GeoJSON FeatureCollection.
+
+    Each group is a dict with keys:
+        needles     – list of strings to match against feature names
+        output_name – name for the merged output feature
+
+    A feature is claimed by the first group that matches. Unmatched features
+    pass through unchanged.
     """
     features = geojson.get("features", [])
     if not features:
@@ -111,63 +131,79 @@ def process(
         name_property = find_name_property(features)
         print(f"[info] Using name property: '{name_property}'")
 
-    needle = search_string if case_sensitive else search_string.lower()
+    # Prepare groups with pre-computed needles
+    groups = []
+    for g in merge_groups:
+        raw_needles = normalise_search(g["search"])
+        needles = raw_needles if case_sensitive else [n.lower() for n in raw_needles]
+        groups.append({
+            "search":      raw_needles,
+            "output_name": g.get("output_name", raw_needles[0]),
+            "needles":     needles,
+            "matched":     [],      # list of (original_index, feature)
+            "first_index": None,
+        })
 
-    matched = []       # (index, feature) of matching features
-    unmatched = []     # features that don't match
-    first_match_index = None
+    # Single pass: assign each feature to the first matching group
+    unclaimed = []  # (original_index, feature)
 
     for i, feat in enumerate(features):
         raw_name = get_feature_name(feat, name_property)
         haystack = raw_name if case_sensitive else raw_name.lower()
-        if needle in haystack:
-            matched.append((i, feat))
-            if first_match_index is None:
-                first_match_index = i
-        else:
-            unmatched.append((i, feat))
+        claimed = False
+        for g in groups:
+            if feature_matches(haystack, g["needles"]):
+                g["matched"].append((i, feat))
+                if g["first_index"] is None:
+                    g["first_index"] = i
+                claimed = True
+                break
+        if not claimed:
+            unclaimed.append((i, feat))
 
-    if not matched:
-        raise ValueError(
-            f"No features found whose '{name_property}' contains '{search_string}'."
-        )
+    # Build merged features
+    merged_entries = []  # (first_index, merged_feature)
 
-    matched_names = [get_feature_name(f, name_property) for _, f in matched]
-    print(f"[info] Matched {len(matched)} feature(s):")
-    for n in matched_names:
-        print(f"         • {n}")
-
-    # Union matched geometries
-    shapes = []
-    for _, feat in matched:
-        geom = feat.get("geometry")
-        if geom is None:
-            print(f"[warn] Skipping feature with null geometry: {get_feature_name(feat, name_property)}")
+    for g in groups:
+        if not g["matched"]:
+            print(f"[warn] No features matched {g['search']} — skipping.")
             continue
-        try:
-            shapes.append(shape(geom))
-        except Exception as e:
-            print(f"[warn] Could not parse geometry for '{get_feature_name(feat, name_property)}': {e}")
 
-    if not shapes:
-        raise ValueError("No valid geometries found among matched features.")
+        matched_names = [get_feature_name(f, name_property) for _, f in g["matched"]]
+        print(f"[info] '{g['output_name']}': matched {len(g['matched'])} feature(s):")
+        for n in matched_names:
+            print(f"         • {n}")
 
-    merged_geom = unary_union(shapes)
+        shapes = []
+        for _, feat in g["matched"]:
+            geom = feat.get("geometry")
+            if geom is None:
+                print(f"[warn] Skipping null geometry in group '{g['output_name']}'")
+                continue
+            try:
+                shapes.append(shape(geom))
+            except Exception as e:
+                print(f"[warn] Could not parse geometry for '{get_feature_name(feat, name_property)}': {e}")
 
-    # Build the merged feature (properties from first match, name = search_string)
-    merged_feature = {
-        "type": "Feature",
-        "properties": merge_properties([f for _, f in matched], name_property, search_string),
-        "geometry": mapping(merged_geom),
-    }
+        if not shapes:
+            print(f"[warn] No valid geometries for '{g['output_name']}' — skipping.")
+            continue
 
-    # Reconstruct feature list: non-matching features in original order,
-    # with the merged feature inserted at the position of the first match.
-    all_features = [(i, f) for i, f in unmatched] + [(first_match_index, merged_feature)]
+        merged_geom = unary_union(shapes)
+        merged_feature = {
+            "type": "Feature",
+            "properties": merge_properties(
+                [f for _, f in g["matched"]], name_property, g["output_name"]
+            ),
+            "geometry": mapping(merged_geom),
+        }
+        merged_entries.append((g["first_index"], merged_feature))
+
+    # Reconstruct ordered feature list
+    all_features = unclaimed + merged_entries
     all_features.sort(key=lambda x: x[0])
     output_features = [f for _, f in all_features]
 
-    # Preserve all top-level GeoJSON fields (crs, bbox, etc.) except features
     result = {k: v for k, v in geojson.items() if k != "features"}
     result["type"] = "FeatureCollection"
     result["features"] = output_features
@@ -181,16 +217,16 @@ def process(
 def main():
     parser = argparse.ArgumentParser(
         description=(
-            "Merge GeoJSON features whose name contains a given string. "
+            "Merge GeoJSON features by name using a JSON config file. "
             "Non-matching features are preserved unchanged."
         )
     )
-    parser.add_argument("input", help="Path to the input GeoJSON file")
-    parser.add_argument("search", help='String to match in feature names (e.g. "London")')
+    parser.add_argument("input",  help="Path to the input GeoJSON file")
+    parser.add_argument("merges", help="Path to the JSON merge-config file")
     parser.add_argument(
         "output",
         nargs="?",
-        help="Path for the output GeoJSON file (default: <search>_merged.geojson)",
+        help="Path for the output GeoJSON file (default: <input>_merged.geojson)",
     )
     parser.add_argument(
         "--name-property",
@@ -206,18 +242,26 @@ def main():
 
     args = parser.parse_args()
 
-    if args.output:
-        output_path = args.output
-    else:
-        safe_name = args.search.replace(" ", "_").replace("/", "_")
-        output_path = f"{safe_name}_merged.geojson"
+    output_path = args.output or f"{args.input.rsplit('.', 1)[0]}_merged.geojson"
 
     print(f"[info] Loading '{args.input}' …")
     geojson = load_geojson(args.input)
 
+    print(f"[info] Loading merge config '{args.merges}' …")
+    with open(args.merges, encoding="utf-8") as f:
+        merge_groups = json.load(f)
+
+    if not isinstance(merge_groups, list) or not merge_groups:
+        sys.exit("Error: merges config must be a non-empty JSON array.")
+    for g in merge_groups:
+        if "search" not in g:
+            sys.exit(f"Error: every merge group must have a 'search' key. Got: {g}")
+
+    print(f"[info] {len(merge_groups)} merge group(s) defined.")
+
     result = process(
         geojson,
-        search_string=args.search,
+        merge_groups=merge_groups,
         name_property=args.name_property,
         case_sensitive=args.case_sensitive,
     )

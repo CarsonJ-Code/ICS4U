@@ -29,6 +29,7 @@ void handleCamera() {
     }
 }
 
+
 // set the amount to move the camera by how much the mouse has moved
 void handleMousePan() {
   float x_diff = mouseLast[0] - mouseX;

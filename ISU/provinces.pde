@@ -38,36 +38,60 @@ class Province {
   }
 
   void findBounding() {
+    float[] firstCoord = coords.get(0).get(0);
+    minX = firstCoord[0];
+    maxX = firstCoord[0];
+    minY = firstCoord[1];
+    maxY = firstCoord[1];
+    
     for (int i = 0; i < coords.size(); i++) {
       ArrayList<float[]> currPoly = coords.get(i);
-      float[] firstCoord = currPoly.get(0);
-      minX =firstCoord[0];
-      maxX = firstCoord[0];
-      minY = firstCoord[1];
-      maxY = firstCoord[1];
       for (int j = 0; j < currPoly.size(); j++) {
         float[] coord = currPoly.get(j);
 
         if (coord[0] < minX) minX = coord[0];
         if (coord[0] > maxX) maxX = coord[0];
 
-        if (coord[1] < minY) minY = coord[0];
-        if (coord[1] > maxY) maxY = coord[0];
+        if (coord[1] < minY) minY = coord[1];
+        if (coord[1] > maxY) maxY = coord[1];
       }
     }
   }
 
 
-  boolean inProvince(float x, float y) {
-    if (x >= minX && x <= maxX && y >= minY && y <= maxY){
-      return true;
+  boolean inProvince(float[] test) {
+    if (test[0] >= minX && test[0] <= maxX && test[1] >= minY && test[1] <= maxY) {
+
+      // test each polygon
+      for (int polyCount = 0; polyCount < coords.size(); polyCount++) {
+        boolean inside = false;
+        ArrayList<float[]> currPoly = coords.get(polyCount);
+
+        // test each edge with a line
+        for (int i = 0, j = currPoly.size() - 1; i < currPoly.size(); j = i, i++) {
+          float[] frontPoint = currPoly.get(i);
+          float[] backPoint = currPoly.get(j);
+          float xIntersect = (frontPoint[0] - backPoint[0]) * (test[1] - backPoint[1]) / (frontPoint[1] - backPoint[1]) + backPoint[0];
+
+          if ((frontPoint[1] > test[1] ^ backPoint[1] > test[1]) && (test[0] < xIntersect)) {
+            inside = !inside;
+          }
+        }
+        if (inside) return true;
+      }
     }
-      return false;
+    return false;
+  }
+
+  String getName() {
+    return name;
   }
 }
 
+
+
 void loadProvinces() {
-  JSONObject geojson = loadJSONObject("MergedIsles.geojson");
+  JSONObject geojson = loadJSONObject("FinalIsles.geojson");
   JSONArray features = geojson.getJSONArray("features");
 
   for (int i = 0; i < features.size(); i++) {
@@ -76,7 +100,7 @@ void loadProvinces() {
     JSONObject properties = feature.getJSONObject("properties");
     JSONArray  coords   = geometry.getJSONArray("coordinates");
     String     geomType = geometry.getString("type");
-    String         name = properties.isNull("SETTL_NAME") ? "Unknown" : properties.getString("SETTL_NAME");
+    String         name = properties.isNull("name") ? "Unknown" : properties.getString("name");
 
     ArrayList<ArrayList<float[]>> provCoords = new ArrayList<ArrayList<float[]>>();
 
@@ -88,7 +112,7 @@ void loadProvinces() {
 
       for (int j = 0; j < outerRing.size(); j++) {
         JSONArray point = outerRing.getJSONArray(j);
-        shape.add(new float[]{ point.getFloat(0), -point.getFloat(1) });
+        shape.add(new float[]{ point.getFloat(0) - 904750, -point.getFloat(1) + 1255375});
       }
       provCoords.add(shape);
     } else if (geomType.equals("MultiPolygon")) {
@@ -100,7 +124,7 @@ void loadProvinces() {
 
         for (int j = 0; j < outerRing.size(); j++) {
           JSONArray point = outerRing.getJSONArray(j);
-          shape.add(new float[]{ point.getFloat(0), -point.getFloat(1) });
+          shape.add(new float[]{ point.getFloat(0) - 904750, -point.getFloat(1) + 1255375});
         }
 
         provCoords.add(shape);
