@@ -1,4 +1,3 @@
-ArrayList<Element> elements = new ArrayList<Element>();
 
 class TextElement {
   int[] TL;
@@ -6,6 +5,11 @@ class TextElement {
   String text;
   int textSize;
   color textColour;
+  boolean isActive = true;
+
+  void setText(String newText) {
+    text = newText;
+  }
 
   TextElement(int[] TLArg, int[] dimensionsArg, String textArg) {
     TL = TLArg;
@@ -34,6 +38,13 @@ class TextElement {
     fill(textColour);
     text(text, TL[0], TL[1], TL[0] + dimensions[0], TL[1] + dimensions[1]);
   }
+
+  boolean getActivity() {
+    return isActive;
+  }
+  void setActivity(boolean newActivity) {
+    isActive = newActivity;
+  }
 }
 
 class RectElement {
@@ -42,6 +53,7 @@ class RectElement {
   color fillColour;
   int strokeWidth;
   color strokeColour;
+  boolean isActive = true;
 
   RectElement(int[] TLArg, int[] dimensionsArg, color colourArg) {
     TL = TLArg;
@@ -65,12 +77,19 @@ class RectElement {
     fill(fillColour);
     rect(TL[0], TL[1], dimensions[0], dimensions[1]);
   }
+  boolean getActivity() {
+    return isActive;
+  }
+  void setActivity(boolean newActivity) {
+    isActive = newActivity;
+  }
 }
 
 class ImageElement {
   int[] TL;
   int[] dimensions;
   PImage image;
+  boolean isActive = true;
 
   ImageElement(int[] TLArg, int[] dimensionsArg, PImage imageArg) {
     TL = TLArg;
@@ -78,6 +97,12 @@ class ImageElement {
     image = imageArg;
   }
 
+  boolean getActivity() {
+    return isActive;
+  }
+  void setActivity(boolean newActivity) {
+    isActive = newActivity;
+  }
 
 
   void drawImage() {
@@ -85,36 +110,40 @@ class ImageElement {
   }
 }
 
-class Element {
-  ArrayList<RectElement> rects;
-  ArrayList<TextElement> texts;
-  ArrayList<ImageElement> images;
+//class Element {
+//  ArrayList<RectElement> rects;
+//  ArrayList<TextElement> texts;
+//  ArrayList<ImageElement> images;
+//  boolean isActive;
 
-  Element(ArrayList<RectElement> rectsArg, ArrayList<TextElement> textsArg, ArrayList<ImageElement> imagesArg) {
-    rects = rectsArg;
-    texts = textsArg;
-    images = imagesArg;
-  }
+//  Element() {
+//  }
 
-  void drawElement() {
-    drawRects();
-    drawImages();
-    drawTexts();
-  }
+//  Element(ArrayList<RectElement> rectsArg, ArrayList<TextElement> textsArg, ArrayList<ImageElement> imagesArg) {
+//    rects = rectsArg;
+//    texts = textsArg;
+//    images = imagesArg;
+//  }
 
-  void drawRects() {
-    for (RectElement rect : rects) {
-      rect.drawRect();
-    }
-  }
-  void drawTexts() {
-    for (TextElement text : texts) {
-      text.drawText();
-    }
-  }
-  void drawImages() {
-    for (ImageElement img : images) {
-      img.drawImage();
-    }
-  }
-}
+//  void drawElement() {
+//    drawRects();
+//    drawImages();
+//    drawTexts();
+//  }
+
+//  void drawRects() {
+//    for (RectElement rect : rects) {
+//      rect.drawRect();
+//    }
+//  }
+//  void drawTexts() {
+//    for (TextElement text : texts) {
+//      text.drawText();
+//    }
+//  }
+//  void drawImages() {
+//    for (ImageElement img : images) {
+//      img.drawImage();
+//    }
+//  }
+//}
