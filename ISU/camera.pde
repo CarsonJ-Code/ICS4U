@@ -1,6 +1,6 @@
 float[] mousePan = {0, 0};
 float[] mouseLast = {0, 0};
-float zoom = 5;
+float zoom = 2750;
 float[] centre = {0, 0};
 boolean holdingPan = false;
 
