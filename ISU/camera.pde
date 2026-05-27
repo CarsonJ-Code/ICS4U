@@ -15,11 +15,6 @@ void mousePressed() {
     }
 }
 
-void mouseReleased() {
-    if (mouseButton == CENTER) {
-        holdingPan = false;
-    }
-}
 
 void handleCamera() {
     if (holdingPan) {

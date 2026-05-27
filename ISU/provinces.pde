@@ -24,6 +24,8 @@ class Province {
 
   void draw() {
 
+    fill(getControllerColour());
+
     for (int i = 0; i < coords.size(); i++) {
       ArrayList<float[]> currPoly = coords.get(i);
       beginShape();
@@ -41,7 +43,7 @@ class Province {
     maxX = firstCoord[0];
     minY = firstCoord[1];
     maxY = firstCoord[1];
-    
+
     for (int i = 0; i < coords.size(); i++) {
       ArrayList<float[]> currPoly = coords.get(i);
       for (int j = 0; j < currPoly.size(); j++) {
@@ -84,6 +86,36 @@ class Province {
   String getName() {
     return name;
   }
+
+  void setController(int id) {
+    controller = id;
+  }
+
+  String getController() {
+    switch(controller) {
+    case 1:
+      return "Anglo-Saxon";
+    case 2:
+      return "Norman";
+    case 3:
+      return "Noresman";
+    default:
+      return "None";
+    }
+  }
+
+  color getControllerColour() {
+    switch(controller) {
+    case 1:
+      return #C4106A;
+    case 2:
+      return #2D8AD3;
+    case 3:
+      return #23AF2B;
+    default:
+      return #787878;
+    }
+  }
 }
 
 
@@ -99,6 +131,8 @@ void loadProvinces() {
     JSONArray  coords   = geometry.getJSONArray("coordinates");
     String     geomType = geometry.getString("type");
     String         name = properties.isNull("name") ? "Unknown" : properties.getString("name");
+
+
 
     ArrayList<ArrayList<float[]>> provCoords = new ArrayList<ArrayList<float[]>>();
 
