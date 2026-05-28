@@ -1,14 +1,38 @@
 class Graph {
   boolean[][] verticeArray;
   float[][] verticeLocation;
-  
-  Graph(boolean[][] verticeArgs, float[][] locationArgs){
-   verticeArray = verticeArgs;
-   verticeLocation = locationArgs;
+
+  Graph(boolean[][] verticeArgs, float[][] locationArgs) {
+    verticeArray = verticeArgs;
+    verticeLocation = locationArgs;
+  }
+
+  ArrayList<Integer> pathFinding(int startIndex, int endIndex) {
+    boolean[] bordering = verticeArray[startIndex];
+    for (int vertice = 0; vertice < verticeArray.length; vertice++) {
+      if(bordering[vertice]) 
+    }
+    ArrayList<Integer> nullArray = new ArrayList<Integer>();
+    return nullArray;
   }
   
-  ArrayList<int> dijkstraPath(int startIndex, int endIndex){
-    boolean[] bordering = verticeArray[startIndex];
+  int[] explorePath(int currIndex, int goalIndex){
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
   }
 }
