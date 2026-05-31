@@ -1,12 +1,17 @@
 String activeProvinceName;
+Graph provinceGraph;
 
 void setup() {
   size(1600, 900);
+  provinceGraph = new Graph();
   loadProvinces();
   for (Province province : provinces) province.findBounding();
 
   initProvinceView();
+  
+  populateEdges();
 }
+
 
 void draw() {
   background(#ECE3A1);
@@ -24,7 +29,7 @@ void draw() {
       activeProvinceName = province.getName();
       activeProvince = province;
     }
-  
+
     province.draw();
     fill(#C4106A);
   }
@@ -32,6 +37,7 @@ void draw() {
   provinceBox.setActivity(foundProvince);
   provinceName.setActivity(foundProvince);
   provinceController.setActivity(foundProvince);
+  provinceNeighbours.setActivity(foundProvince);
 
   // draw province panel
   if (provinceBox.getActivity()) {
@@ -40,6 +46,8 @@ void draw() {
     provinceName.drawText();
     provinceController.setText(activeProvince.getController());
     provinceController.drawText();
+    provinceNeighbours.setText(provinceGraph.neighboursAsString(activeProvinceName));
+    provinceNeighbours.drawText();
   }
 }
 

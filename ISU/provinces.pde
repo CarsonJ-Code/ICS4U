@@ -116,6 +116,10 @@ class Province {
       return #787878;
     }
   }
+  
+  ArrayList<ArrayList<float[]>> getCoords(){
+   return coords; 
+  }
 }
 
 
@@ -163,5 +167,58 @@ void loadProvinces() {
       }
     }
     provinces.add(new Province(provCoords, name));
+
+    provinceGraph.addNode(name);
   }
+}
+
+// populate graph edges
+
+void populateEdges() {
+
+  for (int i = 0; i < provinces.size(); i++) {
+    for (int j = i + 1; j < provinces.size(); j++) {
+
+      if (shareBorder(provinces.get(i).getCoords(), provinces.get(j).getCoords())) {
+        provinceGraph.addEdge(provinces.get(i).getName(), provinces.get(j).getName());
+      }
+    }
+  }
+}
+
+boolean shareBorder(ArrayList<ArrayList<float[]>> polyA, ArrayList<ArrayList<float[]>> polyB) {
+
+  for (ArrayList<float[]> ringA : polyA) {
+    for (ArrayList<float[]> ringB : polyB) {
+
+      for (int i = 0; i < ringA.size(); i++) {
+        float[] a1 = ringA.get(i);
+        float[] a2 = ringA.get((i + 1) % ringA.size());
+
+        for (int j = 0; j < ringB.size(); j++) {
+          float[] b1 = ringB.get(j);
+          float[] b2 = ringB.get((j + 1) % ringB.size());
+
+          if (sameEdge(a1, a2, b1, b2)) {
+            return true;
+          }
+        }
+      }
+    }
+  }
+
+  return false;
+}
+boolean sameEdge(
+  float[] a1, float[] a2,
+  float[] b1, float[] b2) {
+
+  return
+    (samePoint(a1, b1) && samePoint(a2, b2)) ||
+    (samePoint(a1, b2) && samePoint(a2, b1));
+}
+
+boolean samePoint(float[] p1, float[] p2) {
+  return p1[0] == p2[0] &&
+    p1[1] == p2[1];
 }
