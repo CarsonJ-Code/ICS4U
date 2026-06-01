@@ -1,25 +1,33 @@
 ArrayList<Province> provinces = new ArrayList<Province>();
+HashMap<Integer, String> provinceNames = new HashMap<Integer, String>();
+HashMap<String, Integer> provinceIDs = new HashMap<String, Integer>();
 
 class Province {
   ArrayList<ArrayList<float[]>> coords;
   int controller;
+
   String name;
+  int id;
 
   float minX;
   float maxX;
   float minY;
   float maxY;
 
-  Province(ArrayList<ArrayList<float[]>> coordsArg, String nameArg) {
+  float[] centre;
+
+  Province(ArrayList<ArrayList<float[]>> coordsArg, String nameArg, int idArg) {
     coords = coordsArg;
     name = nameArg;
     controller = 0;
+    id = idArg;
   }
 
-  Province(ArrayList<ArrayList<float[]>> coordsArg, String nameArg, int controllerArg) {
+  Province(ArrayList<ArrayList<float[]>> coordsArg, String nameArg, int idArg, int controllerArg) {
     coords = coordsArg;
     name = nameArg;
     controller = controllerArg;
+    id = idArg;
   }
 
   void draw() {
@@ -56,6 +64,18 @@ class Province {
         if (coord[1] > maxY) maxY = coord[1];
       }
     }
+  }
+
+  void findCentre() {
+    centre = new float[]{minX/2 + maxX/2, minY/2 + maxY/2};
+  }
+
+  float[] getCentre() {
+    return centre;
+  }
+
+  int getID() {
+    return id;
   }
 
 
@@ -116,9 +136,9 @@ class Province {
       return #787878;
     }
   }
-  
-  ArrayList<ArrayList<float[]>> getCoords(){
-   return coords; 
+
+  ArrayList<ArrayList<float[]>> getCoords() {
+    return coords;
   }
 }
 
@@ -166,9 +186,11 @@ void loadProvinces() {
         provCoords.add(shape);
       }
     }
-    provinces.add(new Province(provCoords, name));
+    provinces.add(new Province(provCoords, name, i));
 
-    provinceGraph.addNode(name);
+    provinceGraph.addNode(i);
+    provinceNames.put(i, name);
+    provinceIDs.put(name, i);
   }
 }
 
@@ -180,7 +202,7 @@ void populateEdges() {
     for (int j = i + 1; j < provinces.size(); j++) {
 
       if (shareBorder(provinces.get(i).getCoords(), provinces.get(j).getCoords())) {
-        provinceGraph.addEdge(provinces.get(i).getName(), provinces.get(j).getName());
+        provinceGraph.addEdge(provinces.get(i).getID(), provinces.get(j).getID());
       }
     }
   }

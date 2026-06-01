@@ -1,14 +1,19 @@
 String activeProvinceName;
+int activeProvinceID;
 Graph provinceGraph;
+Province activeProvince;
 
-void setup() {
+  void setup() {
   size(1600, 900);
   provinceGraph = new Graph();
   loadProvinces();
-  for (Province province : provinces) province.findBounding();
+  for (Province province : provinces) {
+    province.findBounding();
+    province.findCentre();
+  }
 
   initProvinceView();
-  
+
   populateEdges();
 }
 
@@ -19,7 +24,6 @@ void draw() {
   fill(#C4106A);
 
   // draw provinces
-  Province activeProvince = null;
   boolean foundProvince = false;
   strokeWeight(1);
   for (Province province : provinces) {
@@ -27,6 +31,7 @@ void draw() {
       foundProvince = true;
       fill(#FFFFFF);
       activeProvinceName = province.getName();
+      activeProvinceID = provinceIDs.get(activeProvinceName);
       activeProvince = province;
     }
 
@@ -46,7 +51,8 @@ void draw() {
     provinceName.drawText();
     provinceController.setText(activeProvince.getController());
     provinceController.drawText();
-    provinceNeighbours.setText(provinceGraph.neighboursAsString(activeProvinceName));
+
+    provinceNeighbours.setText(provinceGraph.neighboursAsString(activeProvinceID));
     provinceNeighbours.drawText();
   }
 }
