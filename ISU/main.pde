@@ -3,7 +3,7 @@ int activeProvinceID;
 Graph provinceGraph;
 Province activeProvince;
 
-  void setup() {
+void setup() {
   size(1600, 900);
   provinceGraph = new Graph();
   loadProvinces();
@@ -38,7 +38,6 @@ void draw() {
     province.draw();
     fill(#C4106A);
   }
-
   provinceBox.setActivity(foundProvince);
   provinceName.setActivity(foundProvince);
   provinceController.setActivity(foundProvince);
@@ -55,6 +54,8 @@ void draw() {
     provinceNeighbours.setText(provinceGraph.neighboursAsString(activeProvinceID));
     provinceNeighbours.drawText();
   }
+  
+  handleTroops();
 }
 
 void mouseReleased() {

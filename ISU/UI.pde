@@ -111,40 +111,33 @@ class ImageElement {
   }
 }
 
-//class Element {
-//  ArrayList<RectElement> rects;
-//  ArrayList<TextElement> texts;
-//  ArrayList<ImageElement> images;
-//  boolean isActive;
+void drawUI() {
+  // draw provinces
+  boolean foundProvince = false;
+  strokeWeight(1);
+  for (Province province : provinces) {
+    if (province.inProvince(screenSpaceToPos(new float[]{mouseX, mouseY}))) {
+      foundProvince = true;
+      fill(#FFFFFF);
+      activeProvinceName = province.getName();
+      activeProvinceID = provinceIDs.get(activeProvinceName);
+      activeProvince = province;
+    }
+    provinceBox.setActivity(foundProvince);
+    provinceName.setActivity(foundProvince);
+    provinceController.setActivity(foundProvince);
+    provinceNeighbours.setActivity(foundProvince);
 
-//  Element() {
-//  }
+    // draw province panel
+    if (provinceBox.getActivity()) {
+      provinceBox.drawRect();
+      provinceName.setText(activeProvinceName);
+      provinceName.drawText();
+      provinceController.setText(activeProvince.getController());
+      provinceController.drawText();
 
-//  Element(ArrayList<RectElement> rectsArg, ArrayList<TextElement> textsArg, ArrayList<ImageElement> imagesArg) {
-//    rects = rectsArg;
-//    texts = textsArg;
-//    images = imagesArg;
-//  }
-
-//  void drawElement() {
-//    drawRects();
-//    drawImages();
-//    drawTexts();
-//  }
-
-//  void drawRects() {
-//    for (RectElement rect : rects) {
-//      rect.drawRect();
-//    }
-//  }
-//  void drawTexts() {
-//    for (TextElement text : texts) {
-//      text.drawText();
-//    }
-//  }
-//  void drawImages() {
-//    for (ImageElement img : images) {
-//      img.drawImage();
-//    }
-//  }
-//}
+      provinceNeighbours.setText(provinceGraph.neighboursAsString(activeProvinceID));
+      provinceNeighbours.drawText();
+    }
+  }
+}
