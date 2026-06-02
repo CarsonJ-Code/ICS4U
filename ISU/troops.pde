@@ -19,9 +19,11 @@ class Troop {
     this.speed = speed;
     this.location = location;
     this.owner = owner;
+    this.target = location;
   }
 
-  void startMove() {
+  void startMove(int target) {
+    this.target = target;
     path = provinceGraph.shortestPath(location, target);
     currStop = 0;
   }
@@ -39,14 +41,22 @@ class Troop {
       location = path.get(currStop);
     }
   }
-  void drawTroop(){
-    float[] centre = provinces.get(location).getCentre();
+  void drawTroop() {
+    float[] screenCentre = posToScreenSpace(provinces.get(location).getCentre());
     fill(#3D4127);
-    rect(centre[0], centre[1], 50, 50);
+    rect(screenCentre[0], screenCentre[1], 16, 16); // smaller marker so it's visible
   }
 
+
+
+  void handleTroop() {
+    if(target != location){
+    moveTroop();
+    }
+    drawTroop();
+  }
 }
 
-void handleTroops(){
-  
+void createCavalry(int location, int owner){
+  troops.add(new Troop(100, 15, 30, location, owner));
 }

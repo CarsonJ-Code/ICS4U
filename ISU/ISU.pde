@@ -2,6 +2,7 @@ String activeProvinceName;
 int activeProvinceID;
 Graph provinceGraph;
 Province activeProvince;
+ArrayList<Troop> troops;
 
 void setup() {
   size(1600, 900);
@@ -15,6 +16,9 @@ void setup() {
   initProvinceView();
 
   populateEdges();
+
+  troops = new ArrayList<Troop>();
+  createCavalry(1,0);
 }
 
 
@@ -46,7 +50,7 @@ void draw() {
   // draw province panel
   if (provinceBox.getActivity()) {
     provinceBox.drawRect();
-    provinceName.setText(activeProvinceName);
+    provinceName.setText(str(activeProvinceID));
     provinceName.drawText();
     provinceController.setText(activeProvince.getController());
     provinceController.drawText();
@@ -54,8 +58,9 @@ void draw() {
     provinceNeighbours.setText(provinceGraph.neighboursAsString(activeProvinceID));
     provinceNeighbours.drawText();
   }
-  
-  handleTroops();
+  for (Troop troop : troops) {
+    troop.handleTroop();
+  }
 }
 
 void mouseReleased() {
