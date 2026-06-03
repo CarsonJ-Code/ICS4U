@@ -3,6 +3,7 @@ int activeProvinceID;
 Graph provinceGraph;
 Province activeProvince;
 ArrayList<Troop> troops;
+Troop activeTroop;
 
 void setup() {
   size(1600, 900);
@@ -18,7 +19,7 @@ void setup() {
   populateEdges();
 
   troops = new ArrayList<Troop>();
-  createCavalry(1,0);
+  createCavalry(1, 0);
 }
 
 
@@ -31,16 +32,8 @@ void draw() {
   boolean foundProvince = false;
   strokeWeight(1);
   for (Province province : provinces) {
-    if (province.inProvince(screenSpaceToPos(new float[]{mouseX, mouseY}))) {
-      foundProvince = true;
-      fill(#FFFFFF);
-      activeProvinceName = province.getName();
-      activeProvinceID = provinceIDs.get(activeProvinceName);
-      activeProvince = province;
-    }
-
-    province.draw();
     fill(#C4106A);
+    province.draw();
   }
   provinceBox.setActivity(foundProvince);
   provinceName.setActivity(foundProvince);
@@ -61,6 +54,21 @@ void draw() {
   for (Troop troop : troops) {
     troop.handleTroop();
   }
+
+  if (activeTroop != null) {
+    drawVectorToMouse(provinces.get(activeTroop.getLocation()).getCentre());
+  }
+}
+
+
+void drawVectorToMouse(float[] screenPos) {
+  fill(255, 0, 0);
+  stroke(255, 0, 0);
+  float pos[] = posToScreenSpace(screenPos);
+  circle(pos[0], pos[1], 10);
+
+  line(pos[0], pos[1], mouseX, mouseY);
+  circle(mouseX, mouseY, 10);
 }
 
 void mouseReleased() {
@@ -68,7 +76,36 @@ void mouseReleased() {
   if (mouseButton == CENTER) {
     holdingPan = false;
   }
+
+  if (mouseButton == LEFT) {
+    if (activeTroop == null) {
+      for (Troop troop : troops) {
+        if (troop.trySelectTroop()) {
+          activeTroop = troop;
+          return;
+        }
+      }
+      for (Province province : provinces) {
+        if (province.inProvince(screenSpaceToPos(new float[]{mouseX, mouseY}))) {
+          fill(#FFFFFF);
+          province.draw();
+          activeProvinceName = province.getName();
+          activeProvinceID = provinceIDs.get(activeProvinceName);
+          activeProvince = province;
+          return;
+        }
+      }
+      activeProvince = null;
+    } else {
+      for (Province province : provinces) {
+        if (province.inProvince(screenSpaceToPos(new float[]{mouseX, mouseY}))) {
+          activeTroop.startMove(province.getID());
+        }
+      }
+    }
+  }
 }
+
 
 void keyPressed() {
   for (Province province : provinces) {
