@@ -25,11 +25,11 @@ class Troop {
   }
 
   void startMove(int target) {
-    updateDistance();
-    progress = 0;
     this.target = target;
     path = provinceGraph.shortestPath(location, target);
     currStop = 0;
+    updateDistance();
+    progress = 0;
   }
 
   void updateDistance() {
@@ -40,14 +40,20 @@ class Troop {
 
   void moveTroop() {
     progress += SPEED_FACTOR*speed/distance;
-    println("Progress is " + progress);
     if (progress >= 1) {
-      currStop ++;
+      currStop++;
       location = path.get(currStop);
-      updateDistance();
       progress = 0;
+      handleTroopOnProvince();
+
+      if (currStop < path.size() - 1) {
+        updateDistance();
+      } else {
+        activeTroop = null;
+      }
     }
   }
+
   void drawTroop() {
     float[] screenCentre = posToScreenSpace(provinces.get(location).getCentre());
     fill(#3D4127);
@@ -63,8 +69,15 @@ class Troop {
     drawTroop();
   }
 
-  int getLocation(){
+  int getLocation() {
     return location;
+  }
+
+  int getTarget() {
+    return target;
+  }
+  int getOwner() {
+    return owner;
   }
 
 
@@ -78,8 +91,35 @@ class Troop {
     }
     return false;
   }
+
+  void handleTroopOnProvince() {
+    boolean battle = false;
+    for (Troop troop : troops) {
+      if (troop.getLocation() == location && troop.getOwner() != owner) {
+        battle = true;
+      }
+    }
+    if (battle) handleBattle(location);
+    else {
+      provinces.get(location).setController(owner);
+    }
+  }
 }
 
 void createCavalry(int location, int owner) {
   troops.add(new Troop(100, 15, 30, location, owner));
+}
+
+void handleBattle(int battleLocation) {
+  ArrayList<Troop> belligerants = new ArrayList<Troop>();
+  for (Troop troop : troops) {
+    if (troop.getLocation() == battleLocation) belligerants.add(troop);
+  }
+  for (Troop belligerant : belligerants) {
+    Troop target;
+    do {
+      target = belligerants.get(int(random(belligerants.size())));
+    } while (target.getOwner() == belligerant.getOwner());
+    
+  }
 }

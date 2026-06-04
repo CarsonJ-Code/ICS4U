@@ -45,6 +45,19 @@ class Province {
     }
   }
 
+  void drawSelected() {
+    fill(#FFFFFF);
+    for (int i = 0; i < coords.size(); i++) {
+      ArrayList<float[]> currPoly = coords.get(i);
+      beginShape();
+      for (int j = 0; j < currPoly.size(); j++) {
+        float[] point = posToScreenSpace(currPoly.get(j));
+        vertex(point[0], point[1]);
+      }
+      endShape();
+    }
+  }
+
   void findBounding() {
     float[] firstCoord = coords.get(0).get(0);
     minX = firstCoord[0];
@@ -202,7 +215,10 @@ void populateEdges() {
     for (int j = i + 1; j < provinces.size(); j++) {
 
       if (shareBorder(provinces.get(i).getCoords(), provinces.get(j).getCoords())) {
-        provinceGraph.addEdge(provinces.get(i).getID(), provinces.get(j).getID());
+        float[] coords1 = provinces.get(i).getCentre();
+        float[] coords2 = provinces.get(j).getCentre();
+        float weight = dist(coords1[0], coords1[0], coords2[0], coords2[1]);
+        provinceGraph.addEdge(provinces.get(i).getID(), provinces.get(j).getID(), weight/10);
       }
     }
   }
@@ -244,5 +260,4 @@ boolean samePoint(float[] p1, float[] p2) {
   return p1[0] == p2[0] &&
     p1[1] == p2[1];
 }
-
 
