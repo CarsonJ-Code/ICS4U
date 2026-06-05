@@ -21,7 +21,8 @@ void setup() {
   populateEdges();
 
   troops = new ArrayList<Troop>();
-  createCavalry(1, 0);
+  createCavalry(1, 1);
+  createCavalry(2, 2);
 
   // add edges from Leinster to Wales and Ulster to Southern Scotland to fix Dijkstra's
   addBridges();
@@ -61,15 +62,17 @@ void draw() {
     provinceNeighbours.setText(provinceGraph.neighboursAsString(activeProvinceID));
     provinceNeighbours.drawText();
   }
-  for (Troop troop : troops) {
-    troop.handleTroop();
-  }
 
   if (activeTroop != null && activeTroop.getTarget() == activeTroop.getLocation()) {
     drawVectorToMouse(provinces.get(activeTroop.getLocation()).getCentre());
     fill(#000000);
     stroke(#000000);
   }
+
+  for (Troop troop : troops) {
+    troop.handleTroop();
+  }
+  bringOutYourDead();
 }
 
 void addBridges() {
@@ -109,13 +112,21 @@ void mouseReleased() {
           return;
         }
       }
-    } else if(troopSelectedFlag){
+      activeProvince = null;
+      foundProvince = false;
+    } else if (troopSelectedFlag) {
       for (Province province : provinces) {
         if (province.inProvince(screenSpaceToPos(new float[]{mouseX, mouseY}))) {
           troopSelectedFlag = false;
-          activeTroop.startMove(province.getID());
+          if (activeTroop.getLocation() != province.getID()) {
+            activeTroop.startMove(province.getID());
+          }
         }
       }
+      activeTroop = null;
+      troopSelectedFlag = false;
+      activeProvince = null;
+      foundProvince = false;
     }
   }
 }

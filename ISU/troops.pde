@@ -2,26 +2,28 @@ class Troop {
   static final int ICON_SIZE = 32;
   static final float SPEED_FACTOR = 100;
   int maxHealth;
-  int currHealth;
-  int strength;
+  float currHealth;
+  float strength;
   int speed;
   int location;
   int owner;
+  PImage icon;
 
   // movement variables
   int currStop;
-  int target;
-  float distance;
+  int target; float distance;
   float progress;
   ArrayList<Integer> path;
 
   Troop(int maxHealth, int strength, int speed, int location, int owner) {
     this.maxHealth = maxHealth;
+    this.currHealth = maxHealth;
     this.strength = strength;
     this.speed = speed;
     this.location = location;
     this.owner = owner;
     this.target = location;
+    this.icon = loadImage("sword.png");
   }
 
   void startMove(int target) {
@@ -58,6 +60,7 @@ class Troop {
     float[] screenCentre = posToScreenSpace(provinces.get(location).getCentre());
     fill(#3D4127);
     rect(screenCentre[0], screenCentre[1], ICON_SIZE, ICON_SIZE);
+    image(icon, screenCentre[0], screenCentre[1], ICON_SIZE, ICON_SIZE);
   }
 
 
@@ -67,6 +70,7 @@ class Troop {
       moveTroop();
     }
     drawTroop();
+    handleTroopOnProvince();
   }
 
   int getLocation() {
@@ -78,6 +82,15 @@ class Troop {
   }
   int getOwner() {
     return owner;
+  }
+  float getStrength() {
+    return strength;
+  }
+  void removeHealth(float damageAmount) {
+    currHealth -= damageAmount;
+  }
+  float getHealth() {
+    return currHealth;
   }
 
 
@@ -99,8 +112,11 @@ class Troop {
         battle = true;
       }
     }
-    if (battle) handleBattle(location);
-    else {
+    if (battle) {
+      println("Handling a battle in " + location);
+
+      handleBattle(location);
+    } else {
       provinces.get(location).setController(owner);
     }
   }
@@ -108,6 +124,15 @@ class Troop {
 
 void createCavalry(int location, int owner) {
   troops.add(new Troop(100, 15, 30, location, owner));
+}
+void createLevy(int location, int owner){
+  troops.add(new Troop(250, 5, 10, location, owner));
+}
+void createMercenary(int location, int owner){
+  troops.add(new Troop(200, 10, 15, location, owner));
+}
+void createArcher(int location, int owner){
+  troops.add(new Troop(50, 25, 15, location, owner));
 }
 
 void handleBattle(int battleLocation) {
@@ -120,6 +145,19 @@ void handleBattle(int battleLocation) {
     do {
       target = belligerants.get(int(random(belligerants.size())));
     } while (target.getOwner() == belligerant.getOwner());
-    
+    float damageAmount = belligerant.getStrength() + random(-5,5);
+    target.removeHealth(damageAmount);
+  }
+}
+
+void bringOutYourDead() {
+  ArrayList<Troop> deadTroops = new ArrayList<Troop>();
+  for (Troop troop : troops) {
+    if (troop.getHealth() <= 0) {
+      deadTroops.add(troop);
+    }
+  }
+  for (Troop troop : deadTroops) {
+    troops.remove(troop);
   }
 }
