@@ -16,13 +16,15 @@ void setup() {
     province.findCentre();
   }
 
-  initProvinceView();
+  initUI();
 
   populateEdges();
 
   troops = new ArrayList<Troop>();
   createCavalry(1, 1);
-  createCavalry(2, 2);
+  createLevy(2, 1);
+  createMercenary(3, 1);
+  createArcher(4, 1);
 
   // add edges from Leinster to Wales and Ulster to Southern Scotland to fix Dijkstra's
   addBridges();
@@ -39,6 +41,47 @@ void draw() {
     province.draw();
   }
 
+  handleDrawProvinceUI();
+  handleDrawTroopUI();
+  // draw troop panel
+
+
+  if (activeTroop != null && activeTroop.getTarget() == activeTroop.getLocation()) {
+    drawVectorToMouse(provinces.get(activeTroop.getLocation()).getCentre());
+    fill(#000000);
+    stroke(#000000);
+  }
+
+  for (Troop troop : troops) {
+    troop.handleTroop();
+  }
+  bringOutYourDead();
+}
+
+void handleDrawTroopUI() {
+  if (troopSelectedFlag && activeTroop != null) {
+    activeTroopOwner.setText(getFactionName(activeTroop.getOwner()));
+    activeTroopHealth.setText("Health: " + activeTroop.getHealth());
+    activeTroopStrength.setText("Strength: " + activeTroop.getStrength());
+  } else if (activeTroop == null) {
+    troopSelectedFlag = false;
+  }
+
+  activeTroopInfo.setActivity(troopSelectedFlag);
+  activeTroopOwner.setActivity(troopSelectedFlag);
+  activeTroopHealth.setActivity(troopSelectedFlag);
+  activeTroopStrength.setActivity(troopSelectedFlag);
+
+  if (troopSelectedFlag) {
+    activeTroopInfo.drawRect();
+    activeTroopOwner.drawText();
+    activeTroopHealth.drawText();
+    activeTroopStrength.drawText();
+  }
+}
+
+
+void handleDrawProvinceUI() {
   if (activeProvince != null) {
     activeProvinceName = activeProvince.getName();
     activeProvinceID = provinceIDs.get(activeProvinceName);
@@ -56,23 +99,12 @@ void draw() {
     provinceBox.drawRect();
     provinceName.setText(activeProvinceName);
     provinceName.drawText();
-    provinceController.setText(activeProvince.getController());
+    provinceController.setText(getFactionName(activeProvince.getController()));
     provinceController.drawText();
 
     provinceNeighbours.setText(provinceGraph.neighboursAsString(activeProvinceID));
     provinceNeighbours.drawText();
   }
-
-  if (activeTroop != null && activeTroop.getTarget() == activeTroop.getLocation()) {
-    drawVectorToMouse(provinces.get(activeTroop.getLocation()).getCentre());
-    fill(#000000);
-    stroke(#000000);
-  }
-
-  for (Troop troop : troops) {
-    troop.handleTroop();
-  }
-  bringOutYourDead();
 }
 
 void addBridges() {

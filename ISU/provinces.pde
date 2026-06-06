@@ -124,139 +124,122 @@ class Province {
     controller = id;
   }
 
-  String getController() {
-    switch(controller) {
-    case 1:
-      return "Anglo-Saxon";
-    case 2:
-      return "Norman";
-    case 3:
-      return "Noresman";
-    default:
-      return "None";
-    }
+  int getController() {
+    return controller;
   }
 
   color getControllerColour() {
-    switch(controller) {
-    case 1:
-      return #C4106A;
-    case 2:
-      return #2D8AD3;
-    case 3:
-      return #23AF2B;
-    default:
-      return #787878;
-    }
+    return getFactionColour(controller);
   }
 
   ArrayList<ArrayList<float[]>> getCoords() {
     return coords;
   }
+
 }
 
 
+  void loadProvinces() {
+    JSONObject geojson = loadJSONObject("FinalIsles.geojson");
+    JSONArray features = geojson.getJSONArray("features");
 
-void loadProvinces() {
-  JSONObject geojson = loadJSONObject("FinalIsles.geojson");
-  JSONArray features = geojson.getJSONArray("features");
-
-  for (int i = 0; i < features.size(); i++) {
-    JSONObject feature  = features.getJSONObject(i);
-    JSONObject geometry = feature.getJSONObject("geometry");
-    JSONObject properties = feature.getJSONObject("properties");
-    JSONArray  coords   = geometry.getJSONArray("coordinates");
-    String     geomType = geometry.getString("type");
-    String         name = properties.isNull("name") ? "Unknown" : properties.getString("name");
-
+    for (int i = 0; i < features.size(); i++) {
+      JSONObject feature  = features.getJSONObject(i);
+      JSONObject geometry = feature.getJSONObject("geometry");
+      JSONObject properties = feature.getJSONObject("properties");
+      JSONArray  coords   = geometry.getJSONArray("coordinates");
+      String     geomType = geometry.getString("type");
+      String         name = properties.isNull("name") ? "Unknown" : properties.getString("name");
 
 
-    ArrayList<ArrayList<float[]>> provCoords = new ArrayList<ArrayList<float[]>>();
+
+      ArrayList<ArrayList<float[]>> provCoords = new ArrayList<ArrayList<float[]>>();
 
 
-    if (geomType.equals("Polygon")) {
-      // Only process the outer ring (index 0), skip holes (index 1+)
-      JSONArray outerRing = coords.getJSONArray(0);
-      ArrayList<float[]> shape = new ArrayList<float[]>();
-
-      for (int j = 0; j < outerRing.size(); j++) {
-        JSONArray point = outerRing.getJSONArray(j);
-        shape.add(new float[]{ point.getFloat(0) - 904750, -point.getFloat(1) + 1255375});
-      }
-      provCoords.add(shape);
-    } else if (geomType.equals("MultiPolygon")) {
-      // Each polygon in the multipolygon becomes its own shape entry
-      for (int p = 0; p < coords.size(); p++) {
-        JSONArray polygon  = coords.getJSONArray(p);
-        JSONArray outerRing = polygon.getJSONArray(0);
+      if (geomType.equals("Polygon")) {
+        // Only process the outer ring (index 0), skip holes (index 1+)
+        JSONArray outerRing = coords.getJSONArray(0);
         ArrayList<float[]> shape = new ArrayList<float[]>();
 
         for (int j = 0; j < outerRing.size(); j++) {
           JSONArray point = outerRing.getJSONArray(j);
           shape.add(new float[]{ point.getFloat(0) - 904750, -point.getFloat(1) + 1255375});
         }
-
         provCoords.add(shape);
-      }
-    }
-    provinces.add(new Province(provCoords, name, i));
+      } else if (geomType.equals("MultiPolygon")) {
+        // Each polygon in the multipolygon becomes its own shape entry
+        for (int p = 0; p < coords.size(); p++) {
+          JSONArray polygon  = coords.getJSONArray(p);
+          JSONArray outerRing = polygon.getJSONArray(0);
+          ArrayList<float[]> shape = new ArrayList<float[]>();
 
-    provinceGraph.addNode(i);
-    provinceNames.put(i, name);
-    provinceIDs.put(name, i);
-  }
-}
-
-// populate graph edges
-
-void populateEdges() {
-
-  for (int i = 0; i < provinces.size(); i++) {
-    for (int j = i + 1; j < provinces.size(); j++) {
-
-      if (shareBorder(provinces.get(i).getCoords(), provinces.get(j).getCoords())) {
-        float[] coords1 = provinces.get(i).getCentre();
-        float[] coords2 = provinces.get(j).getCentre();
-        float weight = dist(coords1[0], coords1[0], coords2[0], coords2[1]);
-        provinceGraph.addEdge(provinces.get(i).getID(), provinces.get(j).getID(), weight/10);
-      }
-    }
-  }
-}
-
-boolean shareBorder(ArrayList<ArrayList<float[]>> polyA, ArrayList<ArrayList<float[]>> polyB) {
-
-  for (ArrayList<float[]> ringA : polyA) {
-    for (ArrayList<float[]> ringB : polyB) {
-
-      for (int i = 0; i < ringA.size(); i++) {
-        float[] a1 = ringA.get(i);
-        float[] a2 = ringA.get((i + 1) % ringA.size());
-
-        for (int j = 0; j < ringB.size(); j++) {
-          float[] b1 = ringB.get(j);
-          float[] b2 = ringB.get((j + 1) % ringB.size());
-
-          if (sameEdge(a1, a2, b1, b2)) {
-            return true;
+          for (int j = 0; j < outerRing.size(); j++) {
+            JSONArray point = outerRing.getJSONArray(j);
+            shape.add(new float[]{ point.getFloat(0) - 904750, -point.getFloat(1) + 1255375});
           }
+
+          provCoords.add(shape);
+        }
+      }
+      provinces.add(new Province(provCoords, name, i));
+
+      provinceGraph.addNode(i);
+      provinceNames.put(i, name);
+      provinceIDs.put(name, i);
+    }
+  }
+
+  // populate graph edges
+
+  void populateEdges() {
+
+    for (int i = 0; i < provinces.size(); i++) {
+      for (int j = i + 1; j < provinces.size(); j++) {
+
+        if (shareBorder(provinces.get(i).getCoords(), provinces.get(j).getCoords())) {
+          float[] coords1 = provinces.get(i).getCentre();
+          float[] coords2 = provinces.get(j).getCentre();
+          float weight = dist(coords1[0], coords1[1], coords2[0], coords2[1]);
+          provinceGraph.addEdge(provinces.get(i).getID(), provinces.get(j).getID(), weight/10);
         }
       }
     }
   }
 
-  return false;
-}
-boolean sameEdge(
-  float[] a1, float[] a2,
-  float[] b1, float[] b2) {
+  boolean shareBorder(ArrayList<ArrayList<float[]>> polyA, ArrayList<ArrayList<float[]>> polyB) {
 
-  return
-    (samePoint(a1, b1) && samePoint(a2, b2)) ||
-    (samePoint(a1, b2) && samePoint(a2, b1));
-}
+    for (ArrayList<float[]> ringA : polyA) {
+      for (ArrayList<float[]> ringB : polyB) {
 
-boolean samePoint(float[] p1, float[] p2) {
-  return p1[0] == p2[0] &&
-    p1[1] == p2[1];
-}
+        for (int i = 0; i < ringA.size(); i++) {
+          float[] a1 = ringA.get(i);
+          float[] a2 = ringA.get((i + 1) % ringA.size());
+
+          for (int j = 0; j < ringB.size(); j++) {
+            float[] b1 = ringB.get(j);
+            float[] b2 = ringB.get((j + 1) % ringB.size());
+
+            if (sameEdge(a1, a2, b1, b2)) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+  boolean sameEdge(
+    float[] a1, float[] a2,
+    float[] b1, float[] b2) {
+
+    return
+      (samePoint(a1, b1) && samePoint(a2, b2)) ||
+      (samePoint(a1, b2) && samePoint(a2, b1));
+  }
+
+  boolean samePoint(float[] p1, float[] p2) {
+    return p1[0] == p2[0] &&
+      p1[1] == p2[1];
+  }
+

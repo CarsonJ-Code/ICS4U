@@ -133,7 +133,7 @@ void drawUI() {
       provinceBox.drawRect();
       provinceName.setText(activeProvinceName);
       provinceName.drawText();
-      provinceController.setText(activeProvince.getController());
+      provinceController.setText(getFactionName(activeProvince.getController()));
       provinceController.drawText();
 
       provinceNeighbours.setText(provinceGraph.neighboursAsString(activeProvinceID));
