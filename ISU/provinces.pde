@@ -260,4 +260,3 @@ boolean samePoint(float[] p1, float[] p2) {
   return p1[0] == p2[0] &&
     p1[1] == p2[1];
 }
-

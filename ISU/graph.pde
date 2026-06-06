@@ -16,14 +16,14 @@ class Graph {
   // ── Internal types ──────────────────────────────────────────────────────────
 
   class Edge {
-    int   to;
+    int   dest;
     float weight;
-    Edge(int to, float weight) {
-      this.to     = to;
+    Edge(int dest, float weight) {
+      this.dest     = dest;
       this.weight = weight;
     }
     int getNode() {
-      return to;
+      return dest;
     }
   }
 
@@ -69,16 +69,16 @@ class Graph {
    * Adds a weighted edge between from and to (weight-1 default for unweighted use).
    * Nodes are created automatically if missing.
    */
-  void addEdge(int from, int to, float weight) {
+  void addEdge(int from, int dest, float weight) {
     addNode(from);
-    addNode(to);
-    adj.get(from).add(new Edge(to, weight));
-    if (!directed) adj.get(to).add(new Edge(from, weight));
+    addNode(dest);
+    adj.get(from).add(new Edge(dest, weight));
+    if (!directed) adj.get(dest).add(new Edge(from, weight));
   }
 
   /** Convenience overload — unit weight. */
-  void addEdge(int from, int to) {
-    addEdge(from, to, 1.0);
+  void addEdge(int from, int dest) {
+    addEdge(from, dest, 1.0);
   }
 
   /** Removes a node and all its incident edges. */
@@ -87,22 +87,22 @@ class Graph {
     for (ArrayList<Edge> edges : adj.values()) {
       Iterator<Edge> it = edges.iterator();
       while (it.hasNext()) {
-        if (it.next().to == id) it.remove();
+        if (it.next().dest == id) it.remove();
       }
     }
   }
 
   /** Removes a specific edge (both directions for undirected). */
-  void removeEdge(int from, int to) {
-    removeDirectedEdge(from, to);
-    if (!directed) removeDirectedEdge(to, from);
+  void removeEdge(int from, int dest) {
+    removeDirectedEdge(from, dest);
+    if (!directed) removeDirectedEdge(dest, from);
   }
 
-  private void removeDirectedEdge(int from, int to) {
+  private void removeDirectedEdge(int from, int dest) {
     if (!adj.containsKey(from)) return;
     Iterator<Edge> it = adj.get(from).iterator();
     while (it.hasNext()) {
-      if (it.next().to == to) {
+      if (it.next().dest == dest) {
         it.remove();
         break;
       }
@@ -117,9 +117,9 @@ class Graph {
   }
 
   /** Returns true if there is a direct edge from → to. */
-  boolean hasEdge(int from, int to) {
+  boolean hasEdge(int from, int dest) {
     if (!adj.containsKey(from)) return false;
-    for (Edge e : adj.get(from)) if (e.to == to) return true;
+    for (Edge e : adj.get(from)) if (e.dest == dest) return true;
     return false;
   }
 
@@ -132,7 +132,7 @@ class Graph {
   ArrayList<Integer> neighbours(int id) {
     ArrayList<Integer> ns = new ArrayList<Integer>();
     if (!adj.containsKey(id)) return ns;
-    for (Edge e : adj.get(id)) ns.add(e.to);
+    for (Edge e : adj.get(id)) ns.add(e.dest);
     return ns;
   }
 
@@ -185,10 +185,10 @@ class Graph {
 
       for (Edge e : adj.get(cur.node)) {
         float newCost = dist.get(cur.node) + e.weight;
-        if (newCost < dist.get(e.to)) {
-          dist.put(e.to, newCost);
-          prev.put(e.to, cur.node);
-          pq.add(new Entry(e.to, newCost));
+        if (newCost < dist.get(e.dest)) {
+          dist.put(e.dest, newCost);
+          prev.put(e.dest, cur.node);
+          pq.add(new Entry(e.dest, newCost));
         }
       }
     }
@@ -210,9 +210,9 @@ class Graph {
 
     float total = 0;
     for (int i = 0; i < path.size() - 1; i++) {
-      int from = path.get(i), to = path.get(i + 1);
+      int from = path.get(i), dest = path.get(i + 1);
       for (Edge e : adj.get(from)) {
-        if (e.to == to) {
+        if (e.dest == dest) {
           total += e.weight;
           break;
         }
@@ -229,7 +229,7 @@ class Graph {
       sb.append("  " + node + " → ");
       ArrayList<Edge> edges = adj.get(node);
       for (int i = 0; i < edges.size(); i++) {
-        sb.append(edges.get(i).to + "(" + edges.get(i).weight + ")");
+        sb.append(edges.get(i).dest + "(" + edges.get(i).weight + ")");
         if (i < edges.size() - 1) sb.append(", ");
       }
       sb.append("\n");
