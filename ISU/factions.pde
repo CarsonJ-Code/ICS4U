@@ -1,3 +1,6 @@
+int[] factionWealth = new int[] {0, 0, 0};
+int playerFaction = 1;
+
 String getFactionName(int factionID) {
   switch(factionID) {
   case 1:

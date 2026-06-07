@@ -9,25 +9,7 @@ boolean troopSelectedFlag = false;
 
 void setup() {
   size(1600, 900);
-  provinceGraph = new Graph();
-  loadProvinces();
-  for (Province province : provinces) {
-    province.findBounding();
-    province.findCentre();
-  }
-
-  initUI();
-
-  populateEdges();
-
-  troops = new ArrayList<Troop>();
-  createCavalry(1, 1);
-  createLevy(2, 1);
-  createMercenary(3, 1);
-  createArcher(4, 1);
-
-  // add edges from Leinster to Wales and Ulster to Southern Scotland to fix Dijkstra's
-  addBridges();
+  init();
 }
 
 
@@ -58,54 +40,6 @@ void draw() {
   bringOutYourDead();
 }
 
-void handleDrawTroopUI() {
-  if (troopSelectedFlag && activeTroop != null) {
-    activeTroopOwner.setText(getFactionName(activeTroop.getOwner()));
-    activeTroopHealth.setText("Health: " + activeTroop.getHealth());
-    activeTroopStrength.setText("Strength: " + activeTroop.getStrength());
-  } else if (activeTroop == null) {
-    troopSelectedFlag = false;
-  }
-
-  activeTroopInfo.setActivity(troopSelectedFlag);
-  activeTroopOwner.setActivity(troopSelectedFlag);
-  activeTroopHealth.setActivity(troopSelectedFlag);
-  activeTroopStrength.setActivity(troopSelectedFlag);
-
-  if (troopSelectedFlag) {
-    activeTroopInfo.drawRect();
-    activeTroopOwner.drawText();
-    activeTroopHealth.drawText();
-    activeTroopStrength.drawText();
-  }
-}
-
-
-void handleDrawProvinceUI() {
-  if (activeProvince != null) {
-    activeProvinceName = activeProvince.getName();
-    activeProvinceID = provinceIDs.get(activeProvinceName);
-    activeProvince.drawSelected();
-    foundProvince = true;
-  }
-
-  provinceBox.setActivity(foundProvince);
-  provinceName.setActivity(foundProvince);
-  provinceController.setActivity(foundProvince);
-  provinceNeighbours.setActivity(foundProvince);
-
-  // draw province panel
-  if (provinceBox.getActivity()) {
-    provinceBox.drawRect();
-    provinceName.setText(activeProvinceName);
-    provinceName.drawText();
-    provinceController.setText(getFactionName(activeProvince.getController()));
-    provinceController.drawText();
-
-    provinceNeighbours.setText(provinceGraph.neighboursAsString(activeProvinceID));
-    provinceNeighbours.drawText();
-  }
-}
 
 void addBridges() {
   provinceGraph.addEdge(19, 20, 10);
