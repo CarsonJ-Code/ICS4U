@@ -31,7 +31,14 @@ void doTaxLogic() {
   if (frameNumber % 60 == 0) {
     for (Province province : provinces) {
       int controller = province.getController();
-      if(controller != 0) factionWealth[controller-1]++;
+      if (controller != 0) factionWealth[controller-1]++;
     }
+  }
+}
+
+void checkWinState() {
+  int[] provincesHeld = new int[]{0, 0, 0, 0};
+  for (Province province : provinces) {
+    provincesHeld[province.getController()]++;
   }
 }
