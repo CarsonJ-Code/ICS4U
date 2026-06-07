@@ -6,14 +6,17 @@ ArrayList<Troop> troops;
 Troop activeTroop;
 boolean foundProvince;
 boolean troopSelectedFlag = false;
+long frameNumber = 0;
 
 void setup() {
   size(1600, 900);
   init();
+  frameRate(60);
 }
 
 
 void draw() {
+  frameNumber++;
   background(#ECE3A1);
   handleCamera();
 
@@ -23,8 +26,10 @@ void draw() {
     province.draw();
   }
 
+
   handleDrawProvinceUI();
   handleDrawTroopUI();
+  handleDrawWealthUI();
   // draw troop panel
 
 
@@ -38,6 +43,8 @@ void draw() {
     troop.handleTroop();
   }
   bringOutYourDead();
+
+  doTaxLogic();
 }
 
 

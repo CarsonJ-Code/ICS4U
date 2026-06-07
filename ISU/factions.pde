@@ -26,3 +26,12 @@ color getFactionColour(int factionID) {
     return #787878;
   }
 }
+
+void doTaxLogic() {
+  if (frameNumber % 60 == 0) {
+    for (Province province : provinces) {
+      int controller = province.getController();
+      if(controller != 0) factionWealth[controller-1]++;
+    }
+  }
+}

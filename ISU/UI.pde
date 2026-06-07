@@ -159,3 +159,10 @@ void handleDrawProvinceUI() {
     provinceNeighbours.drawText();
   }
 }
+
+void handleDrawWealthUI(){
+  wealthBox.drawRect();
+  wealthValue.setText(str(factionWealth[playerFaction-1]));
+  wealthValue.drawText();
+  wealthSymbol.drawImage();
+}

@@ -242,12 +242,4 @@ boolean samePoint(float[] p1, float[] p2) {
     p1[1] == p2[1];
 }
 
-void doProvinceLogic() {
-  int[] provincesOwned = new int[4];
-  for (Province province : provinces) {
-    provincesOwned[province.getController()]++;
-  }
-  for (int i = 0; i < 3; i ++) {
-    factionWealth[i] += provincesOwned[i+1];
-  }
-}
+
