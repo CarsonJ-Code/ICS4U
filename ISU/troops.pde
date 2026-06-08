@@ -114,7 +114,7 @@ class Troop {
   boolean trySelectTroop() {
     float[] testLocation = new float[]{mouseX, mouseY};
     float[] provLocation = posToScreenSpace(provinces.get(location).getCentre());
-    if (testLocation[0] >= provLocation[0] && testLocation[0] <= provLocation[0] + ICON_SIZE && testLocation[1] >= provLocation[1] && testLocation[1] <= provLocation[1] + ICON_SIZE) {
+    if (owner == playerFaction && testLocation[0] >= provLocation[0] && testLocation[0] <= provLocation[0] + ICON_SIZE && testLocation[1] >= provLocation[1] && testLocation[1] <= provLocation[1] + ICON_SIZE) {
       return true;
     }
     return false;
@@ -128,7 +128,6 @@ class Troop {
       }
     }
     if (battle) {
-      println("Handling a battle in " + location);
 
       handleBattle(location);
     } else {
@@ -138,16 +137,16 @@ class Troop {
 }
 
 void createCavalry(int location, int owner) {
-  troops.add(new Troop(100, 15, 30, location, owner, loadImage("cavalry.png")));
+  troops.add(new Troop(100, 15, 30, location, owner, loadImage("images/cavalry.png")));
 }
 void createLevy(int location, int owner) {
-  troops.add(new Troop(250, 5, 10, location, owner, loadImage("levy.png")));
+  troops.add(new Troop(250, 5, 10, location, owner, loadImage("images/levy.png")));
 }
 void createMercenary(int location, int owner) {
-  troops.add(new Troop(200, 10, 15, location, owner, loadImage("mercenary.png")));
+  troops.add(new Troop(200, 10, 15, location, owner, loadImage("images/mercenary.png")));
 }
 void createArcher(int location, int owner) {
-  troops.add(new Troop(50, 25, 15, location, owner, loadImage("archer.png")));
+  troops.add(new Troop(50, 25, 15, location, owner, loadImage("images/archer.png")));
 }
 
 void handleBattle(int battleLocation) {
@@ -176,3 +175,4 @@ void bringOutYourDead() {
     troops.remove(troop);
   }
 }
+

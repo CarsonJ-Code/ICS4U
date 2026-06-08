@@ -109,29 +109,34 @@ class ImageElement {
   void drawImage() {
     image(image, TL[0], TL[1], dimensions[0], dimensions[1]);
   }
-}
 
-void handleDrawTroopUI() {
-  if (troopSelectedFlag && activeTroop != null) {
-    activeTroopOwner.setText(getFactionName(activeTroop.getOwner()));
-    activeTroopHealth.setText("Health: " + activeTroop.getHealth());
-    activeTroopStrength.setText("Strength: " + activeTroop.getStrength());
-  } else if (activeTroop == null) {
-    troopSelectedFlag = false;
+  boolean isClicked(int x, int y) {
+    if (x > TL[0] && x < TL[0] + dimensions[0] && y > TL[1] && y < TL[1] + dimensions[1]) return true;
+    return false;
+    }
   }
 
-  activeTroopInfo.setActivity(troopSelectedFlag);
-  activeTroopOwner.setActivity(troopSelectedFlag);
-  activeTroopHealth.setActivity(troopSelectedFlag);
-  activeTroopStrength.setActivity(troopSelectedFlag);
+  void handleDrawTroopUI() {
+    if (troopSelectedFlag && activeTroop != null) {
+      activeTroopOwner.setText(getFactionName(activeTroop.getOwner()));
+      activeTroopHealth.setText("Health: " + activeTroop.getHealth());
+      activeTroopStrength.setText("Strength: " + activeTroop.getStrength());
+    } else if (activeTroop == null) {
+      troopSelectedFlag = false;
+    }
 
-  if (troopSelectedFlag) {
-    activeTroopInfo.drawRect();
-    activeTroopOwner.drawText();
-    activeTroopHealth.drawText();
-    activeTroopStrength.drawText();
+    activeTroopInfo.setActivity(troopSelectedFlag);
+    activeTroopOwner.setActivity(troopSelectedFlag);
+    activeTroopHealth.setActivity(troopSelectedFlag);
+    activeTroopStrength.setActivity(troopSelectedFlag);
+
+    if (troopSelectedFlag) {
+      activeTroopInfo.drawRect();
+      activeTroopOwner.drawText();
+      activeTroopHealth.drawText();
+      activeTroopStrength.drawText();
+    }
   }
-}
 
 
 void handleDrawProvinceUI() {
@@ -160,7 +165,7 @@ void handleDrawProvinceUI() {
   }
 }
 
-void handleDrawWealthUI(){
+void handleDrawWealthUI() {
   wealthBox.drawRect();
   wealthValue.setText(str(factionWealth[playerFaction-1]));
   wealthValue.drawText();

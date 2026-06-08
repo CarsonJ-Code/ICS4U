@@ -11,7 +11,7 @@ static float ZOOM_AMOUNT = 25;
 void mousePressed() {
     if (mouseButton == CENTER) {
         holdingPan = true;
-        mouseLast = new float[]{mouseX, mouseY}; // ← also fixes the ghost-jump bug (see below)
+        mouseLast = new float[]{mouseX, mouseY};
     }
 }
 

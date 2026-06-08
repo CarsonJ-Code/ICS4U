@@ -8,6 +8,15 @@ boolean foundProvince;
 boolean troopSelectedFlag = false;
 long frameNumber = 0;
 
+enum gameState {
+  selectScreen,
+    play,
+    endWin,
+    endLose
+}
+
+gameState currState = gameState.selectScreen;
+
 void setup() {
   size(1600, 900);
   init();
@@ -16,38 +25,45 @@ void setup() {
 
 
 void draw() {
-  frameNumber++;
   background(#ECE3A1);
-  handleCamera();
+  if (currState == gameState.selectScreen) {
+    handleIntroScreen();
+  } else if (currState == gameState.endWin) {
+    handleWinScreen();
+  } else if (currState == gameState.endLose) {
+    handleLoseScreen();
+  } else {
+    frameNumber++;
+    handleCamera();
 
-  // draw provinces
-  strokeWeight(1);
-  for (Province province : provinces) {
-    province.draw();
+    // draw provinces
+    strokeWeight(1);
+    for (Province province : provinces) {
+      province.draw();
+    }
+
+
+    handleDrawProvinceUI();
+    handleDrawTroopUI();
+    handleDrawWealthUI();
+    // draw troop panel
+
+
+    if (activeTroop != null && activeTroop.getTarget() == activeTroop.getLocation()) {
+      drawVectorToMouse(provinces.get(activeTroop.getLocation()).getCentre());
+      fill(#000000);
+      stroke(#000000);
+    }
+
+    for (Troop troop : troops) {
+      troop.handleTroop();
+    }
+    bringOutYourDead();
+
+    doTaxLogic();
+    testWin();
   }
-
-
-  handleDrawProvinceUI();
-  handleDrawTroopUI();
-  handleDrawWealthUI();
-  // draw troop panel
-
-
-  if (activeTroop != null && activeTroop.getTarget() == activeTroop.getLocation()) {
-    drawVectorToMouse(provinces.get(activeTroop.getLocation()).getCentre());
-    fill(#000000);
-    stroke(#000000);
-  }
-
-  for (Troop troop : troops) {
-    troop.handleTroop();
-  }
-  bringOutYourDead();
-
-  doTaxLogic();
 }
-
-
 void addBridges() {
   provinceGraph.addEdge(19, 20, 10);
   provinceGraph.addEdge(1, 16, 10);
@@ -65,7 +81,32 @@ void drawVectorToMouse(float[] screenPos) {
 }
 
 void mouseReleased() {
+  switch(currState) {
+  case selectScreen:
+    handleIntroClick();
+    break;
+  case play:
+    handlePlayClick();
+    break;
+  default:
+    break;
+  }
+}
 
+
+void keyPressed() {
+  for (Province province : provinces) {
+    if (province.inProvince(screenSpaceToPos(new float[]{mouseX, mouseY}))) {
+      if (key == '0') province.setController(0);
+      if (key == '1') province.setController(1);
+      if (key == '2') province.setController(2);
+      if (key == '3') province.setController(3);
+      return;
+    }
+  }
+}
+
+void handlePlayClick() {
   if (mouseButton == CENTER) {
     holdingPan = false;
   }
@@ -104,15 +145,14 @@ void mouseReleased() {
   }
 }
 
-
-void keyPressed() {
+void testWin() {
+  int playerControllerProvinces = 0;
   for (Province province : provinces) {
-    if (province.inProvince(screenSpaceToPos(new float[]{mouseX, mouseY}))) {
-      if (key == '0') province.setController(0);
-      if (key == '1') province.setController(1);
-      if (key == '2') province.setController(2);
-      if (key == '3') province.setController(3);
-      return;
-    }
+    if (province.getController() == playerFaction) playerControllerProvinces ++;
+  }
+  if (playerControllerProvinces == 0) {
+    currState = gameState.endLose;
+  } else if (playerControllerProvinces >= 32) {
+    currState = gameState.endWin;
   }
 }

@@ -1,21 +1,30 @@
+// province box
 TextElement provinceName;
 RectElement provinceBox;
 TextElement provinceController;
 TextElement provinceNeighbours;
 
+// troop box
 RectElement activeTroopInfo;
 TextElement activeTroopOwner;
 TextElement activeTroopHealth;
 TextElement activeTroopStrength;
 
+// wealth box
 RectElement wealthBox;
 TextElement wealthValue;
 ImageElement wealthSymbol;
+
+// intro elements
+ImageElement normanCrest;
+ImageElement angloCrest;
+ImageElement norseCrest;
 
 void initUI() {
   initProvinceView();
   initTroopView();
   initWealthView();
+  initStartView();
 }
 
 void initProvinceView() {
@@ -35,5 +44,11 @@ void initTroopView() {
 void initWealthView() {
   wealthBox = new RectElement(new int[] {1400, 0}, new int[]{200, 200}, color(#444444));
   wealthValue = new TextElement(new int[] {1420, 50}, new int[]{180, 100}, "0", 72, color(#FFFFFF));
-  wealthSymbol = new ImageElement(new int[] {1480, 20}, new int[] {100, 100}, loadImage("money.png"));
+  wealthSymbol = new ImageElement(new int[] {1480, 20}, new int[] {100, 100}, loadImage("images/money.png"));
+}
+
+void initStartView(){
+  normanCrest = new ImageElement(new int[] {33, 200}, new int[] {500, 500}, loadImage("images/Norman.png"));
+  angloCrest = new ImageElement(new int[] {566, 200}, new int[] {500, 500}, loadImage("images/Anglo.png"));
+  norseCrest = new ImageElement(new int[] {1100, 200}, new int[] {500, 500}, loadImage("images/Norse.png"));
 }
