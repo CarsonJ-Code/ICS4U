@@ -16,7 +16,7 @@ class Troop {
   float progress;
   ArrayList<Integer> path;
 
-  Troop(int maxHealth, int strength, int speed, int location, int owner, PImage icon) {
+  Troop(int maxHealth, float strength, int speed, int location, int owner, PImage icon) {
     this.maxHealth = maxHealth;
     this.currHealth = maxHealth;
     this.strength = strength;
@@ -78,6 +78,18 @@ class Troop {
     image(icon, screenCentre[0], screenCentre[1], ICON_SIZE, ICON_SIZE);
   }
 
+  void drawTroopStats(int[] screenLocation) {
+    // icon to right, health bar, strength number
+    image(icon, screenLocation[0], screenLocation[1], 50, 50);
+    fill(#FF0000);
+    rect(screenLocation[0] + 75, screenLocation[1], 150, 10);
+    fill(#00FF00);
+    rect(screenLocation[0] + 75, screenLocation[1], 150*currHealth/maxHealth, 10);
+    fill(#FFFFFF);
+    textSize(24);
+    text("Strength: " + nf(strength*currHealth/maxHealth, 0, 1), screenLocation[0] + 75, screenLocation[1] + 50);
+  }
+
 
 
   void handleTroop() {
@@ -106,6 +118,9 @@ class Troop {
   }
   float getHealth() {
     return currHealth;
+  }
+  float getMaxHealth(){
+    return maxHealth;
   }
 
 
@@ -137,16 +152,16 @@ class Troop {
 }
 
 void createCavalry(int location, int owner) {
-  troops.add(new Troop(100, 15, 30, location, owner, loadImage("images/cavalry.png")));
+  troops.add(new Troop(200, 1.5, 30, location, owner, loadImage("images/cavalry.png")));
 }
 void createLevy(int location, int owner) {
-  troops.add(new Troop(250, 5, 10, location, owner, loadImage("images/levy.png")));
+  troops.add(new Troop(500, 0.5, 10, location, owner, loadImage("images/levy.png")));
 }
 void createMercenary(int location, int owner) {
-  troops.add(new Troop(200, 10, 15, location, owner, loadImage("images/mercenary.png")));
+  troops.add(new Troop(400, 1, 15, location, owner, loadImage("images/mercenary.png")));
 }
 void createArcher(int location, int owner) {
-  troops.add(new Troop(50, 25, 15, location, owner, loadImage("images/archer.png")));
+  troops.add(new Troop(100, 2.5, 15, location, owner, loadImage("images/archer.png")));
 }
 
 void handleBattle(int battleLocation) {
@@ -154,13 +169,13 @@ void handleBattle(int battleLocation) {
   for (Troop troop : troops) {
     if (troop.getLocation() == battleLocation) belligerants.add(troop);
   }
-  if(activeProvinceID == battleLocation) showBattle(belligerants);
+  if (activeProvinceID == battleLocation) showBattle(belligerants);
   for (Troop belligerant : belligerants) {
     Troop target;
     do {
       target = belligerants.get(int(random(belligerants.size())));
     } while (target.getOwner() == belligerant.getOwner());
-    float damageAmount = belligerant.getStrength() + random(-5, 5);
+    float damageAmount = belligerant.getStrength()*(belligerant.getHealth()/belligerant.getMaxHealth()) * random(0.8, 1.2);
     target.removeHealth(damageAmount);
   }
 }

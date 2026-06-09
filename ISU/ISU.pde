@@ -36,6 +36,8 @@ void draw() {
     frameNumber++;
     handleCamera();
 
+    
+
     // draw provinces
     strokeWeight(1);
     for (Province province : provinces) {
@@ -44,7 +46,7 @@ void draw() {
 
     handleDrawUI();
 
-    // draw troop panel
+    // draw troops
     if (activeTroop != null && activeTroop.getTarget() == activeTroop.getLocation()) {
       drawVectorToMouse(provinces.get(activeTroop.getLocation()).getCentre());
       fill(#000000);

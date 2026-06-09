@@ -12,11 +12,8 @@ void init() {
 
   troops = new ArrayList<Troop>();
   createCavalry(1, 1);
-  createLevy(2, 1);
-  createMercenary(3, 1);
-  createArcher(4, 1);
-
-  createCavalry(10,2);
+  createCavalry(2, 2);
+  createCavalry(3,3);
 
   // add edges from Leinster to Wales and Ulster to Southern Scotland to fix Dijkstra's
   addBridges();
