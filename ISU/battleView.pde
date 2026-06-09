@@ -9,7 +9,7 @@ void showBattle(ArrayList<Troop> belligerants) {
   fill(getFactionColour(3));
   rect(500, 160, 200, 10);
   for (Troop troop : belligerants) {
-    int[] location = new int[]{-235 + 250*troop.getOwner(), 200};
+    int[] location = new int[]{-225 + 240*troop.getOwner(), 200};
     troop.drawTroopStats(location);
   }
 }

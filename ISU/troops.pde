@@ -82,9 +82,9 @@ class Troop {
     // icon to right, health bar, strength number
     image(icon, screenLocation[0], screenLocation[1], 50, 50);
     fill(#FF0000);
-    rect(screenLocation[0] + 75, screenLocation[1], 150, 10);
+    rect(screenLocation[0] + 75, screenLocation[1], 125, 10);
     fill(#00FF00);
-    rect(screenLocation[0] + 75, screenLocation[1], 150*currHealth/maxHealth, 10);
+    rect(screenLocation[0] + 75, screenLocation[1], 125*currHealth/maxHealth, 10);
     fill(#FFFFFF);
     textSize(24);
     text("Strength: " + nf(strength*currHealth/maxHealth, 0, 1), screenLocation[0] + 75, screenLocation[1] + 50);
