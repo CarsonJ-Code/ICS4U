@@ -154,6 +154,7 @@ void handleBattle(int battleLocation) {
   for (Troop troop : troops) {
     if (troop.getLocation() == battleLocation) belligerants.add(troop);
   }
+  if(activeProvinceID == battleLocation) showBattle(belligerants);
   for (Troop belligerant : belligerants) {
     Troop target;
     do {
