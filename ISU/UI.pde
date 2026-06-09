@@ -113,31 +113,37 @@ class ImageElement {
   boolean isClicked(int x, int y) {
     if (x > TL[0] && x < TL[0] + dimensions[0] && y > TL[1] && y < TL[1] + dimensions[1]) return true;
     return false;
-    }
+  }
+}
+
+void handleDrawUI(){
+  handleDrawTroopUI();
+  handleDrawProvinceUI();
+  handleDrawWealthUI();
+  handleDrawSpawnButtons();
+}
+
+void handleDrawTroopUI() {
+  if (troopSelectedFlag && activeTroop != null) {
+    activeTroopOwner.setText(getFactionName(activeTroop.getOwner()));
+    activeTroopHealth.setText("Health: " + activeTroop.getHealth());
+    activeTroopStrength.setText("Strength: " + activeTroop.getStrength());
+  } else if (activeTroop == null) {
+    troopSelectedFlag = false;
   }
 
-  void handleDrawTroopUI() {
-    if (troopSelectedFlag && activeTroop != null) {
-      activeTroopOwner.setText(getFactionName(activeTroop.getOwner()));
-      activeTroopHealth.setText("Health: " + activeTroop.getHealth());
-      activeTroopStrength.setText("Strength: " + activeTroop.getStrength());
-    } else if (activeTroop == null) {
-      troopSelectedFlag = false;
-    }
+  activeTroopInfo.setActivity(troopSelectedFlag);
+  activeTroopOwner.setActivity(troopSelectedFlag);
+  activeTroopHealth.setActivity(troopSelectedFlag);
+  activeTroopStrength.setActivity(troopSelectedFlag);
 
-    activeTroopInfo.setActivity(troopSelectedFlag);
-    activeTroopOwner.setActivity(troopSelectedFlag);
-    activeTroopHealth.setActivity(troopSelectedFlag);
-    activeTroopStrength.setActivity(troopSelectedFlag);
-
-    if (troopSelectedFlag) {
-      activeTroopInfo.drawRect();
-      activeTroopOwner.drawText();
-      activeTroopHealth.drawText();
-      activeTroopStrength.drawText();
-    }
+  if (troopSelectedFlag) {
+    activeTroopInfo.drawRect();
+    activeTroopOwner.drawText();
+    activeTroopHealth.drawText();
+    activeTroopStrength.drawText();
   }
-
+}
 
 void handleDrawProvinceUI() {
   if (activeProvince != null) {
@@ -170,4 +176,11 @@ void handleDrawWealthUI() {
   wealthValue.setText(str(factionWealth[playerFaction-1]));
   wealthValue.drawText();
   wealthSymbol.drawImage();
+}
+
+void handleDrawSpawnButtons() {
+  summonCavalry.drawImage();
+  summonArcher.drawImage();
+  summonLevy.drawImage();
+  summonMercenary.drawImage();
 }

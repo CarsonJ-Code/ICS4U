@@ -139,7 +139,7 @@ class Province {
 
 
 void loadProvinces() {
-  JSONObject geojson = loadJSONObject("FinalIsles.geojson");
+  JSONObject geojson = loadJSONObject("provinces/data.geojson");
   JSONArray features = geojson.getJSONArray("features");
 
   for (int i = 0; i < features.size(); i++) {

@@ -176,3 +176,11 @@ void bringOutYourDead() {
   }
 }
 
+void handleTroopUpkeep() {
+  if (frameNumber % 60 == 0) {
+    for (Troop troop : troops) {
+      int controller = troop.getOwner();
+      factionWealth[controller-1]--;
+    }
+  }
+}

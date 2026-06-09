@@ -42,13 +42,9 @@ void draw() {
       province.draw();
     }
 
+    handleDrawUI();
 
-    handleDrawProvinceUI();
-    handleDrawTroopUI();
-    handleDrawWealthUI();
     // draw troop panel
-
-
     if (activeTroop != null && activeTroop.getTarget() == activeTroop.getLocation()) {
       drawVectorToMouse(provinces.get(activeTroop.getLocation()).getCentre());
       fill(#000000);
@@ -61,6 +57,7 @@ void draw() {
     bringOutYourDead();
 
     doTaxLogic();
+    handleTroopUpkeep();
     testWin();
   }
 }
@@ -126,6 +123,7 @@ void handlePlayClick() {
           return;
         }
       }
+      handleSummonTest();
       activeProvince = null;
       foundProvince = false;
     } else if (troopSelectedFlag) {
@@ -152,7 +150,7 @@ void testWin() {
   }
   if (playerControllerProvinces == 0) {
     currState = gameState.endLose;
-  } else if (playerControllerProvinces >= 32) {
+  } else if (playerControllerProvinces >= 33) {
     currState = gameState.endWin;
   }
 }
