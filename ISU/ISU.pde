@@ -167,7 +167,7 @@ void testWin() {
   }
   if (playerControllerProvinces == 0) {
     currState = gameState.endLose;
-  } else if (playerControllerProvinces >= 33) {
+  } else if (playerControllerProvinces > 33) {
     currState = gameState.endWin;
   }
 }
