@@ -97,7 +97,7 @@ class Troop {
 
 
   void handleTroop() {
-    if (target != location) {
+    if (isWalking()) {
       moveTroop();
     }
     drawTroop();
@@ -135,6 +135,9 @@ class Troop {
   }
   boolean getInBattle() {
     return inBattle;
+  }
+  boolean isWalking() {
+    return(location != target);
   }
 
 
