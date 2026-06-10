@@ -16,6 +16,8 @@ class Province {
 
   float[] centre;
 
+  boolean battle = false;
+
   Province(ArrayList<ArrayList<float[]>> coordsArg, String nameArg, int idArg) {
     coords = coordsArg;
     name = nameArg;
@@ -134,6 +136,18 @@ class Province {
 
   ArrayList<ArrayList<float[]>> getCoords() {
     return coords;
+  }
+
+  void setBattle(boolean battle){
+    this.battle = battle;
+  }
+
+  boolean hasBattle(){
+    return false;
+  }
+  int hasTroop(){
+    for (Troop troop : troops) if(troop.getLocation() == id) return troop.getOwner();
+    return 0;
   }
 }
 

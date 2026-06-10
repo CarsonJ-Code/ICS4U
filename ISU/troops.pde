@@ -180,13 +180,13 @@ void createArcher(int location, int owner) {
   troops.add(new Troop(100, 2.5, 15, location, owner, loadImage("images/archer.png")));
 }
 
-void handleBattle(int battleLocation) {
+void hasBattle(int battleLocation) {
   ArrayList<Troop> belligerants = new ArrayList<Troop>();
   for (Troop troop : troops) {
     if (troop.getLocation() == battleLocation) belligerants.add(troop);
   }
   if (activeProvinceID == battleLocation) showBattle(belligerants);
-
+  provinces.get(battleLocation).setBattle(true);
   // Check if there are multiple factions at this location
   int factionCount = 0;
   ArrayList<Integer> factions = new ArrayList<Integer>();
@@ -196,19 +196,23 @@ void handleBattle(int battleLocation) {
       factionCount++;
     }
   }
+  if (factionCount > 1) runBattle(belligerants);
+}
 
-  // Only fight if there are opposing factions
-  if (factionCount > 1) {
-    for (Troop belligerant : belligerants) {
-      belligerant.setInBattle(true);
-      Troop target;
-      do {
-        target = belligerants.get(int(random(belligerants.size())));
-      } while (target.getOwner() == belligerant.getOwner());
-      float damageAmount = belligerant.getStrength()*(belligerant.getHealth()/belligerant.getMaxHealth()) * random(0.8, 1.2);
-      target.removeHealth(damageAmount);
-    }
+void runBattle(ArrayList<Troop> belligerants) {
+  for (Troop belligerant : belligerants) {
+    belligerant.setInBattle(true);
+    Troop target;
+    do {
+      target = belligerants.get(int(random(belligerants.size())));
+    } while (target.getOwner() == belligerant.getOwner());
+    float damageAmount = belligerant.getStrength()*(belligerant.getHealth()/belligerant.getMaxHealth()) * random(0.8, 1.2);
+    target.removeHealth(damageAmount);
   }
+}
+
+void handleBattle(int location) {
+  hasBattle(location);
 }
 
 void bringOutYourDead() {
