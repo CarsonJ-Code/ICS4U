@@ -69,7 +69,7 @@ void draw() {
 
     // heal troops if not in battle
     for (Troop troop : troops) {
-      if (!troop.getInBattle()) troop.addHealth(5);
+      if (!troop.getInBattle()) troop.addHealth(0.5);
       troop.setInBattle(false);
     }
 

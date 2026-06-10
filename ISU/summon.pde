@@ -5,7 +5,7 @@ final int MERCENARY_COST = 100;
 
 
 void handleSummonTest() {
-  if (activeProvince != null) {
+  if (activeProvince != null && activeProvince.getController() == playerFaction) {
     if (summonArcher.isClicked(mouseX, mouseY)) summonArcher();
     else if (summonLevy.isClicked(mouseX, mouseY)) summonLevy();
     else if (summonCavalry.isClicked(mouseX, mouseY)) summonCavalry();
