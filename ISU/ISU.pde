@@ -36,13 +36,14 @@ void draw() {
     frameNumber++;
     handleCamera();
 
-    
+
 
     // draw provinces
     strokeWeight(1);
     for (Province province : provinces) {
       province.draw();
     }
+
 
     handleDrawUI();
 
@@ -56,7 +57,21 @@ void draw() {
     for (Troop troop : troops) {
       troop.handleTroop();
     }
+    for (Integer provID : battles) {
+      handleBattle(int(provID));
+    }
+    battles.clear();
+
+
+
+
     bringOutYourDead();
+
+    // heal troops if not in battle
+    for (Troop troop : troops) {
+      if (!troop.getInBattle()) troop.addHealth(5);
+      troop.setInBattle(false);
+    }
 
     doTaxLogic();
     handleTroopUpkeep();

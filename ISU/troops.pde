@@ -1,3 +1,5 @@
+ArrayList<Integer> battles = new ArrayList<Integer>();
+
 class Troop {
   static final int ICON_SIZE = 32;
   static final float SPEED_FACTOR = 100;
@@ -8,6 +10,8 @@ class Troop {
   int location;
   int owner;
   PImage icon;
+
+  boolean inBattle = false;
 
   // movement variables
   int currStop;
@@ -116,11 +120,21 @@ class Troop {
   void removeHealth(float damageAmount) {
     currHealth -= damageAmount;
   }
+  void addHealth(float healingAmount) {
+    currHealth += healingAmount;
+    if (currHealth > maxHealth) currHealth = maxHealth;
+  }
   float getHealth() {
     return currHealth;
   }
-  float getMaxHealth(){
+  float getMaxHealth() {
     return maxHealth;
+  }
+  void setInBattle(boolean newVal) {
+    inBattle = newVal;
+  }
+  boolean getInBattle() {
+    return inBattle;
   }
 
 
@@ -143,8 +157,7 @@ class Troop {
       }
     }
     if (battle) {
-
-      handleBattle(location);
+      if (!battles.contains(location)) battles.add(location);
     } else {
       provinces.get(location).setController(owner);
     }
@@ -170,13 +183,28 @@ void handleBattle(int battleLocation) {
     if (troop.getLocation() == battleLocation) belligerants.add(troop);
   }
   if (activeProvinceID == battleLocation) showBattle(belligerants);
-  for (Troop belligerant : belligerants) {
-    Troop target;
-    do {
-      target = belligerants.get(int(random(belligerants.size())));
-    } while (target.getOwner() == belligerant.getOwner());
-    float damageAmount = belligerant.getStrength()*(belligerant.getHealth()/belligerant.getMaxHealth()) * random(0.8, 1.2);
-    target.removeHealth(damageAmount);
+
+  // Check if there are multiple factions at this location
+  int factionCount = 0;
+  ArrayList<Integer> factions = new ArrayList<Integer>();
+  for (Troop troop : belligerants) {
+    if (!factions.contains(troop.getOwner())) {
+      factions.add(troop.getOwner());
+      factionCount++;
+    }
+  }
+
+  // Only fight if there are opposing factions
+  if (factionCount > 1) {
+    for (Troop belligerant : belligerants) {
+      belligerant.setInBattle(true);
+      Troop target;
+      do {
+        target = belligerants.get(int(random(belligerants.size())));
+      } while (target.getOwner() == belligerant.getOwner());
+      float damageAmount = belligerant.getStrength()*(belligerant.getHealth()/belligerant.getMaxHealth()) * random(0.8, 1.2);
+      target.removeHealth(damageAmount);
+    }
   }
 }
 
