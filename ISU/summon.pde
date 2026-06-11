@@ -6,35 +6,35 @@ final int MERCENARY_COST = 100;
 
 void handleSummonTest() {
   if (activeProvince != null && activeProvince.getController() == playerFaction) {
-    if (summonArcher.isClicked(mouseX, mouseY)) summonArcher();
-    else if (summonLevy.isClicked(mouseX, mouseY)) summonLevy();
-    else if (summonCavalry.isClicked(mouseX, mouseY)) summonCavalry();
-    else if (summonMercenary.isClicked(mouseX, mouseY)) summonMercenary();
+    if (summonArcher.isClicked(mouseX, mouseY)) summonArcher(playerFaction, activeProvinceID);
+    else if (summonLevy.isClicked(mouseX, mouseY)) summonLevy(playerFaction, activeProvinceID);
+    else if (summonCavalry.isClicked(mouseX, mouseY)) summonCavalry(playerFaction, activeProvinceID);
+    else if (summonMercenary.isClicked(mouseX, mouseY)) summonMercenary(playerFaction, activeProvinceID);
   }
 }
 
 
-void summonArcher() {
-  if (factionWealth[playerFaction-1] >= ARCHER_COST) {
-    factionWealth[playerFaction-1] -= ARCHER_COST;
-    createArcher(activeProvinceID, playerFaction);
+void summonArcher(int faction, int provinceID) {
+  if (factionWealth[faction-1] >= ARCHER_COST) {
+    factionWealth[faction-1] -= ARCHER_COST;
+    createArcher(provinceID, faction);
   }
 }
-void summonCavalry() {
-  if (factionWealth[playerFaction-1] >= CAVALRY_COST) {
-    factionWealth[playerFaction-1] -= CAVALRY_COST;
-    createCavalry(activeProvinceID, playerFaction);
+void summonCavalry(int faction, int provinceID) {
+  if (factionWealth[faction-1] >= CAVALRY_COST) {
+    factionWealth[faction-1] -= CAVALRY_COST;
+    createCavalry(provinceID, faction);
   }
 }
-void summonMercenary() {
-  if (factionWealth[playerFaction-1] >= MERCENARY_COST) {
-    factionWealth[playerFaction-1] -= MERCENARY_COST;
-    createMercenary(activeProvinceID, playerFaction);
+void summonMercenary(int faction, int provinceID) {
+  if (factionWealth[faction-1] >= MERCENARY_COST) {
+    factionWealth[faction-1] -= MERCENARY_COST;
+    createMercenary(provinceID, faction);
   }
 }
-void summonLevy() {
-  if (factionWealth[playerFaction-1] >= LEVY_COST) {
-    factionWealth[playerFaction-1] -= LEVY_COST;
-    createLevy(activeProvinceID, playerFaction);
+void summonLevy(int faction, int provinceID) {
+  if (factionWealth[faction-1] >= LEVY_COST) {
+    factionWealth[faction-1] -= LEVY_COST;
+    createLevy(provinceID, faction);
   }
 }

@@ -75,6 +75,13 @@ class Troop {
     }
   }
 
+  void cancelMove(){
+      path = new ArrayList<Integer>();
+      currStop = 0;
+      distance = 0;
+      progress = 0;
+  }
+
   void drawTroop() {
     float[] screenCentre = posToScreenSpace(provinces.get(location).getCentre());
     fill(getFactionColour(owner));

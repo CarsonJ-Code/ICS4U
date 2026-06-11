@@ -7,6 +7,7 @@ Troop activeTroop;
 boolean foundProvince;
 boolean troopSelectedFlag = false;
 long frameNumber = 0;
+final int TOTAL_PROVINCES = 33;
 
 enum gameState {
   selectScreen,
@@ -62,7 +63,7 @@ void draw() {
     }
     battles.clear();
 
-
+    runAI();
 
 
     bringOutYourDead();
@@ -70,6 +71,9 @@ void draw() {
     // heal troops if not in battle
     for (Troop troop : troops) {
       if (!troop.getInBattle()) troop.addHealth(0.5);
+      else{
+        troop.cancelMove();
+      }
       troop.setInBattle(false);
     }
 
@@ -167,7 +171,7 @@ void testWin() {
   }
   if (playerControllerProvinces == 0) {
     currState = gameState.endLose;
-  } else if (playerControllerProvinces > 33) {
+  } else if (playerControllerProvinces > TOTAL_PROVINCES) {
     currState = gameState.endWin;
   }
 }
