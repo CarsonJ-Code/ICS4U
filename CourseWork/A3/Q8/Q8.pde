@@ -25,6 +25,7 @@ void setup() {
     // If the current value is greater than or equal to the largest,
     // update largest to this value
     if (list[i] >= largest) {
+      second = largest;
       largest = list[i];
     }
     // Otherwise, if the current value is greater than the second largest,

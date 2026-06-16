@@ -135,12 +135,14 @@ void draw() {
       revealDealer();
       text("WIN", 300, 400);
       drawHands();
+      text("r to play again", 300, 500);
       break;
   
     // Player lost - show all cards and a LOSS message
     case PLAYER_LOSS:
       revealDealer();
       text("LOSS", 300, 400);
+      text("r to play again", 300, 500);
       drawHands();
       break;
   
